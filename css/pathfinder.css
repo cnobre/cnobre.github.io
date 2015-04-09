@@ -1,0 +1,216 @@
+		
+       .map {
+		  position: relative;
+		  overflow: hidden;
+		
+		}
+		
+		.layer {
+		  position: absolute;
+		}
+		
+		.tile {
+		  pointer-events: none;
+		  position: absolute;
+		  width: 256px;
+		  height: 256px;
+		}
+		
+		.info {
+		  position: absolute;
+		  bottom: 10px;
+		  left: 10px;
+		}
+
+       
+        .background {
+/*             fill: #a4bac7; */
+/* 		fill:white; */
+			fill: #d5e0e6;
+        }
+        .foreground {
+            fill: none;
+            stroke: #333;
+            stroke-width: 1.5px;
+        }
+        .graticule {
+            fill: none;
+            stroke: #fff;
+            stroke-width: 1px;
+        }
+        
+		/*  All nodes (data and path)  */
+        circle {
+/*             stroke: white; */
+
+        }
+        
+        /*  Selected node in path construction  */
+        circle.active_node {
+            fill: red;
+        }
+        
+        /*  All nodes in a path */
+        circle.path_node {
+            fill: '#606060';
+            opacity: 0.8;
+        }
+        
+        /*  All nodes representing data  */
+        circle.data_node {
+/*             fill: red; */
+        }
+        
+        /*  All nodes within a distance from the path */        
+        circle.selected_node {
+            opacity: 1;
+        }
+        
+        /*  All nodes beyond the threshold distance from the path  */
+        circle.unselected_node {
+            opacity: 0.2;
+        }
+        
+        .graticule:nth-child(2n) {
+            stroke-dasharray: 2, 2;
+        }
+        .land {
+            fill: #d7c7ad;
+            stroke: #766951;
+        }
+        .geojson {
+            fill: none;
+            stroke: red;
+            stroke-width: 5;
+        }
+        .boundary {
+            fill: none;
+            stroke: #a5967e;
+        }
+
+        .pathline {
+            stroke: #616161;
+            opacity: 0.8;
+            stroke-width: 3;
+/*             line-style: dashed; */
+            fill: none;
+        }
+        
+        .connector {
+            stroke: red;
+            opacity: 1;
+            stroke-width: 3;
+            stroke-dasharray:5,5;
+            fill: none;
+        }
+        
+         .mainpath {
+	         stroke: #616161;
+            opacity: 0.8;
+            stroke-width: 6;
+            fill: none;
+        }
+        
+        .track{	        
+	        stroke: #616161;
+	        stroke-width:2px;
+        }
+        
+         .track.highlighted {
+	        stroke:red;
+	        
+        }
+        
+        .dimmed{
+	        opacity: 0.3;
+	        
+        }
+        
+        .axes_background{
+	        opacity: 0.5;
+	        fill:#a4bac7;
+	        
+        }
+        
+        .mainpath.highlighted {
+	        stroke:red;
+	        
+        }
+        
+         .pathline.highlighted {
+	        stroke:red;
+	        
+        }
+        
+        .pathline:hover {
+            cursor: cell;
+        }
+        
+               
+        circle:hover {
+            cursor: pointer;
+        }
+        line {
+            fill: none;
+            stroke: black;
+            stroke-width: 1.5px;
+        }
+        
+        .axis--x text {
+		  font: 15px sans-serif;
+		}
+		
+		.axis--y text {
+		  font: oblique 15px Georgia, serif;
+		}
+		
+		.axis path,
+		.axis line {
+		  fill: none;
+		  stroke: #000;
+		  shape-rendering: crispEdges;
+		}
+		
+		input[type="range"] {
+		    position:absolute;
+		    -webkit-transform: rotate(90deg);
+		    top:433px;
+		    left:-100px;
+		    width:409px;
+		   
+		}
+		
+		#depth_label{
+			-webkit-transform: rotate(90deg);
+			top:433px;
+		    left:-100px;
+
+		}
+		
+		
+		input[type="file"], input[type="checkbox"], input[type="radio"], select {
+			
+/* 			 width:30%; */
+			
+		}
+		
+		.grid .tick {
+		    stroke: lightgrey;
+		    opacity: 0.7;
+		}
+		.grid path {
+		      stroke-width: 0;
+		}
+		
+		.grid line {
+		      stroke-width:1px;
+		      stroke: lightgrey;
+			  opacity: 0.5;
+
+		}
+		
+		.marker {
+			fill:white;
+			stroke:red;
+			opacity:.6;
+		}
