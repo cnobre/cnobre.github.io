@@ -181,35 +181,42 @@
 	       console.log(this.value ==1)
 	        data_nodes = d3.selectAll(".data_node")
 	            .data(user_data.filter(function(d) {
-	                return d.selected
+	                return d.depth==0
 	            }));
 	            
 	            
-	         data_nodes = d3.selectAll(".data_node")
+	       /*
+  data_nodes = d3.selectAll(".data_node")
 	            .data(user_data);
+*/
 	            
 	            
 	        var val = this.value; 
 	
-			console.log(data_nodes);
+/* 			console.log(data_nodes); */
 	        data_nodes.transition()
 	            .duration(500).ease("sin-in-out")
 	              .attr("fill", function(d) {
 					 if (val == 0) {	                 
-					colorbar.scale(color);
-	                colorbarObject.call(colorbar)
-	                return color(d.value) //heatmap(c(d.value));
+					   return color(d.value) //heatmap(c(d.value));
 	                }
 	                
-	                if (val == 1){ 
-	                colorbar.scale(color2);
-	                colorbarObject.call(colorbar)
-	                return color2(d.sal)
-	                }
+	                if (val == 1) 
+	                  return color2(d.sal)
+	                
 	            })
 	            
-	          /*
-data_nodes2 = d3.selectAll(".data_node")
+	            if (val ==0){
+		            colorbar.scale(color);
+	                colorbarObject.call(colorbar)
+                }
+                
+               if (val ==1){
+		            colorbar.scale(color2);
+	                colorbarObject.call(colorbar)
+                }
+
+	          data_nodes2 = axes.selectAll(".data_node")
 	            .data(user_data);
 	
 	
@@ -217,19 +224,14 @@ data_nodes2 = d3.selectAll(".data_node")
 	            .duration(500).ease("sin-in-out")
 	              .attr("fill", function(d) {
 					 
-					if (val == 0) {	                
-					colorbar.scale(color);
-	                colorbarObject.call(colorbar)
+					if (val == 0) {	              
 	                return color(d.value) //heatmap(c(d.value));
 	                }
 	                
 	                if (val == 1){ 
-	                colorbar.scale(color2);
-	                colorbarObject.call(colorbar)
 	                return color2(d.sal)
 	                }
 	            })
-*/
 	        		      
 	
 	    });
