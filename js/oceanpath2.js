@@ -248,8 +248,8 @@
 
 		    // set projection parameters
 		    projection
-		        .scale(1600)
-		        .center([mean_lon, mean_lat])
+		        .scale(1500)
+		        .center([mean_lon+2, mean_lat-.6])
 
 		    // create path variable
 		    var path = d3.geo.path()
