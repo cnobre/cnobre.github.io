@@ -42,7 +42,11 @@
         
         <hr>
         
+       
+        
         <div class="large-12 columns" id="map">
+        </div>
+         <div class="large-12 columns" id="cmap">
         </div>
 
     </div>
@@ -61,9 +65,9 @@
             </label>
             <select id="select_y_axis">
 
-                <option value="All">Depth</option>
-                <option value="All">Temperature</option>
-                <option value="All">Salinity</option>
+                <option value="0">Depth</option>
+                <option value="1">Temperature</option>
+                <option value="2">Salinity</option>
 
             </select>
         </div>
@@ -73,9 +77,9 @@
             </label>
             <select id="select_color_axis">
 
-                <option value="All">Temperature</option>
-                <option value="All">Salinity</option>
-                <option value="All">Depth</option>
+                <option value="0">Temperature</option>
+                <option value="1">Salinity</option>
+                <option value="2">Depth</option>
             </select>
         </div>
 
@@ -95,6 +99,7 @@
 
     <!-- <script src="http://d3js.org/d3.v3.min.js"></script> -->
     <script src="js/d3.min.js"></script>
+    <script src="http://benschmidt.org/colorbar/colorbar.js"></script>
     <script src="http://d3js.org/d3.geo.projection.v0.min.js"></script>
     <script src="http://d3js.org/topojson.v0.min.js"></script>
     <script src="js/topojson.v0.min.js"></script>

@@ -178,31 +178,58 @@
 		//Dropdown menu for Color Axis
 		 d3.select("#select_color_axis").on("change", function() {
 	       
+	       console.log(this.value ==1)
 	        data_nodes = d3.selectAll(".data_node")
 	            .data(user_data.filter(function(d) {
 	                return d.selected
 	            }));
+	            
+	            
+	         data_nodes = d3.selectAll(".data_node")
+	            .data(user_data);
+	            
+	            
+	        var val = this.value; 
 	
-	
+			console.log(data_nodes);
 	        data_nodes.transition()
 	            .duration(500).ease("sin-in-out")
 	              .attr("fill", function(d) {
-					  if (this.value < 1) 
+					 if (val == 0) {	                 
+					colorbar.scale(color);
+	                colorbarObject.call(colorbar)
 	                return color(d.value) //heatmap(c(d.value));
+	                }
+	                
+	                if (val == 1){ 
+	                colorbar.scale(color2);
+	                colorbarObject.call(colorbar)
 	                return color2(d.sal)
+	                }
 	            })
 	            
-	          data_nodes2 = d3.selectAll(".data_node")
+	          /*
+data_nodes2 = d3.selectAll(".data_node")
 	            .data(user_data);
 	
 	
 	        data_nodes2.transition()
 	            .duration(500).ease("sin-in-out")
 	              .attr("fill", function(d) {
-					  if (this.value < 1) 
+					 
+					if (val == 0) {	                
+					colorbar.scale(color);
+	                colorbarObject.call(colorbar)
 	                return color(d.value) //heatmap(c(d.value));
+	                }
+	                
+	                if (val == 1){ 
+	                colorbar.scale(color2);
+	                colorbarObject.call(colorbar)
 	                return color2(d.sal)
+	                }
 	            })
+*/
 	        		      
 	
 	    });
@@ -321,7 +348,7 @@
 		        .append("circle")
 		        .attr("class", 'data_node')
 		        .on("click", function(d, i) {
-		            console.log(d.dist2path, d.selected);
+/* 		            console.log(d.dist2path, d.selected); */
 		            if (d3.select(this).classed("selected_node")) {
 		                user_data[i].selected = false;
 		                d3.select(this)
@@ -348,6 +375,21 @@
 		        .attr("fill", function(d) {
 		            return color(d.value); //heatmap(c(d.value));
 		        })
+		        
+		        
+/* 				        myScale = d3.scale.linear().range(["red","white","blue"]).domain([0,4,25]) */
+		
+		colorbar = Colorbar()
+		    .origin([15,60])
+		    .scale(color)
+		    .orient("horizontal")
+		    .thickness(10)
+		    .barlength(width)
+		
+		placeholder = "#cmap"
+		
+		colorbarObject = d3.select(placeholder)
+		    .call(colorbar)
 
 	    
 
