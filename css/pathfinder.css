@@ -18,8 +18,11 @@
 		
 		.info {
 		  position: absolute;
-		  bottom: 10px;
-		  left: 10px;
+		  bottom: 320px;
+		  left: 40px;
+		  background-color: white;
+		  font-size: large;
+		  padding: 5px;
 		}
 
        

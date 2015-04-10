@@ -1,3 +1,14 @@
+		
+		//Load in both test data sets to the 
+		d3.json("cruise_data.json", function(error, data) {
+		console.log(data);
+		});
+		
+		d3.json("gridded_data.json", function(error, data) {
+		console.log(data);
+		});
+			
+		
 		var margin = {
 		    top: 60.5,
 		    right: 40.5,
@@ -23,11 +34,13 @@
 		var map = d3.select("#map")
 		    .on("mousemove", mousemoved);
 	
-		var raster = map.append("g");
+/* 		var raster = map.append("g"); */
 
 
 		var info = map.append("div")
-		    .attr("class", "info");
+		    .attr("class", "info")
+		    .attr("width","109px")
+			.attr("height","17px");
 
 
 		function formatLocation(p, k) {
@@ -73,7 +86,7 @@
 		var node_handles = [];
 		var path_handles = [];
 
-		//Axis Variables 
+		//Axis scales 
 		var x = d3.scale.linear()
 		    .range([20, width]);
 
@@ -103,12 +116,15 @@
 		    //.tickFormat(function(d) { return "e" + formatPower(Math.round(Math.log(d))); });
 
 
+/* Color Scales used for Demo */
+
+		/* Temperature Color Scale */
 		var color = d3.scale.linear()
 		    .domain([8, 6, 4, 2, 1, 0, -1, -1.2, -1.5, -1.7, -2])
 		    .range(["#67001f", "#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#f7f7f7", "#d1e5f0", "#92c5de", "#4393c3", "#2166ac", "#053061"])
 
+	  /* Salinity  Color Scale */
 		var color2 = d3.scale.linear()
-/* 		    .domain([33.1, 33, 328., 32.6, 32.5, 32.3]) */
 			.domain([27.5, 29, 30, 31, 32, 33.5])
 		    .range(["#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#b10026"])
 
@@ -116,7 +132,7 @@
 		// set projection
 		var projection = d3.geo.mercator();
 
-		//To store user inputed data
+		//To store data
 		var user_data = [];
 
 		var data_nodes_group = map.append("g").attr("id", "data_nodes_group")
@@ -126,7 +142,7 @@
 		    
 
 
-		d3.json("all_data.json", function(error, data) {
+		d3.json("cruise_data.json", function(error, data) {
 
 		    /* 	    map.call(zoom); */
 		    data.lat.map(function(d, i) {
@@ -467,7 +483,7 @@
 
 
 		    function apply_pathway() {
-
+					
 
 		        if (nodes.length < 2) return;
 		        //Calculate distance from each data node to closest branch
@@ -515,8 +531,8 @@
 
 
 
-
-		        update_scatter_plot();
+					
+/* 		        update_scatter_plot(); uncomment for production version - Apr 9*/  
 
 
 		    }
@@ -1005,6 +1021,7 @@
 
 		        cname = ["circle" + String(curr_path)];
 
+				console.log(curr_path)
 		        if (node_handles.length > curr_path)
 		            node_handles[curr_path].remove();
 
@@ -1138,7 +1155,7 @@
 		            'order': 0, // will later be modified/sorted according to relative positions in space 
 		            'level': 0,
 		            'nodes': [start_node],
-		            'color': "black", //Color for main branch is always black
+		            'color': "red", //Color for main branch is always black
 		            'visited': false //used when updating branch distances
 		        };
 
