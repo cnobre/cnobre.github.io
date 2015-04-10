@@ -1,13 +1,31 @@
 		
-		//Load in both test data sets to the 
-		d3.json("cruise_data.json", function(error, data) {
-		console.log(data);
+/* 		For Demo Purposes, pre load two datasets into the browser */
+		
+		//Variables to store the two datasets
+		var cruise_data =[];
+		var gridded_data = [];
+		
+		//Variable for dataset being currently used
+		var data =[];
+		
+		//Load in cruise data set
+		d3.json("cruise_data.json", function(error, cdata) {
+			cruise_data = cdata; 
+			
+			//Default to cruise dataset
+			data = cdata;
+			
+  			//Once data is loaded, render page
+			render_page();
 		});
 		
+		//Load in gridded data set		
 		d3.json("gridded_data.json", function(error, data) {
-		console.log(data);
+		    gridded_data = data;
 		});
 			
+				
+/* 		Page Setup  */
 		
 		var margin = {
 		    top: 60.5,
@@ -91,7 +109,7 @@
 		    .range([20, width]);
 
 		var y = d3.scale.linear()
-		    .range([axis_height, 0]);
+			    .range([axis_height, 0]);
 
 		//Variables to store individual y_scales for each branch 
 		var y_scales = [];
@@ -116,7 +134,7 @@
 		    //.tickFormat(function(d) { return "e" + formatPower(Math.round(Math.log(d))); });
 
 
-/* Color Scales used for Demo */
+		/* Color Scales used for Demo Datasets */
 
 		/* Temperature Color Scale */
 		var color = d3.scale.linear()
@@ -135,18 +153,14 @@
 		//To store data
 		var user_data = [];
 
-		var data_nodes_group = map.append("g").attr("id", "data_nodes_group")
+/* 		var data_nodes_group = map.append("g").attr("id", "data_nodes_group") */
 		    
+/* 		var nodes_group = map.append("g").attr("id", "nodes_group") */
 		    
-		    		var nodes_group = map.append("g").attr("id", "nodes_group")
-		    
-
-
-		d3.json("cruise_data.json", function(error, data) {
-
+		//Function that processes data after it is loaded by d3.json upon page load			
+		function render_page(){
 		    /* 	    map.call(zoom); */
 		    data.lat.map(function(d, i) {
-
 
 		        user_data.push({
 		            "lon": Number(data.lon[i]),
@@ -471,11 +485,11 @@
 
 
 
-		    d3.select("button").on("click", function() {
+		    d3.select("#apply_path").on("click", function() {
 
 		        if (branches.length < 1)
 		            return
-
+					console.log('selected button!');
 		        apply_pathway();
 
 
@@ -1794,4 +1808,5 @@ if (branches.length == 4){
 
 		    };
 
-		});
+/* 		}); */
+};
