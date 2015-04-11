@@ -96,5 +96,16 @@
 
 		        /* 	console.log ('after merging, nodes is', nodes) */
 		    }
+		    
+		    
+		    
+		    /*
+		//Apply Pathway Button
+	    d3.select("#apply_path").on("click", function() {
+	        if (branches.length < 1)
+	            return
+	        apply_pathway();
+	    });
+*/
 
 

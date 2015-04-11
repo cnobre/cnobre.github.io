@@ -20,9 +20,11 @@
 		  position: absolute;
 		  bottom: 320px;
 		  left: 40px;
-		  background-color: white;
+/* 		  background-color:'#0a3354'; */
+		  color:'0a3354';
 		  font-size: large;
 		  padding: 5px;
+		  stroke-color:black;
 		}
 
        
@@ -72,7 +74,7 @@
         
         /*  All nodes beyond the threshold distance from the path  */
         circle.unselected_node {
-            opacity: 0.2;
+            opacity: 0.1;
         }
         
         .graticule:nth-child(2n) {

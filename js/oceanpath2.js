@@ -123,6 +123,10 @@
 			.domain([27.5, 29, 30, 31, 32, 33.5])
 		    .range(["#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#b10026"])
 
+	// Distance color scale for debugging dist2path		
+	     var distcolor =   d3.scale.linear()
+			.domain([0, 30])
+		    .range(["white", "blue"])	
 
 		var colorbar = Colorbar()
 		    .origin([15,60])
@@ -145,13 +149,6 @@
 		
 		//Set callback functions for buttons and dropdown menus 
 		
-		//Apply Pathway Button
-	    d3.select("#apply_path").on("click", function() {
-	        if (branches.length < 1)
-	            return
-	        apply_pathway();
-	    });
-		
 		//Dropdown menu for Y Axis
 	    d3.select("#select_y_axis").on("change", function() {
 	        if (this.value == 0) {
@@ -168,8 +165,7 @@
 	            }, -1000000);
 	
 	            selected_var = 0;
-	            apply_pathway();
-	            return;
+	            
 	        }
 	
 			if (this.value == 1) {
@@ -259,6 +255,9 @@
 	        		      
 	
 	    });
+	    
+		    selected_depth = 0;
+		    selected_var = 0;
 
 
 		//Function that processes data after it is loaded by d3.json upon page load			
@@ -266,8 +265,20 @@
 		    /* 	    map.call(zoom); */
 		    
 		    
+		    //Find domain of data 
+		    
+		    
+		    data_min = user_data.reduce(function(p, v) {
+		        if (v.depth < p) return v.depth;
+		        return p;
+		    }, 1000000);
+
+		    data_max = user_data.reduce(function(p, v) {
+		        if (v.depth > p) return v.depth;
+		        return p;
+		    }, -1000000);
+		    
 		
-		    //Find domain of data (user definable)
 		    value_min = user_data.reduce(function(p, v) {
 		        if (v.value < p) return v.value;
 		        return p;
@@ -290,9 +301,7 @@
 		    }, -1000000);
 
 
-		    selected_depth = 0;
-		    selected_var = 0;
-
+			
 		    // Calculate mean lat and lon values for this dataset
 		    var mean_lat = user_data.reduce(function(p, v) {
 		        return p + v.lat;
@@ -301,10 +310,12 @@
 		        return p + v.lon;
 		    }, 0) / user_data.length;
 
+
 		    // set projection parameters
 		    projection
 		        .scale(1500)
 		        .center([mean_lon+2, mean_lat-.6])
+
 
 		    // create path variable
 		    var path = d3.geo.path()
@@ -313,6 +324,7 @@
 		    var graticule = d3.geo.graticule();
 
 		    var g = svg.append("g")
+			    .attr("id", "mapgroup")
 
 		    g.append("path")
 		        .datum(graticule.outline)
@@ -337,6 +349,13 @@
 		        .datum(topojson.object(worldtopo, worldtopo.objects.land))
 		        .attr("class", "land")
 		        .attr("d", path);
+		       
+		     //add marker to map, later used to link paths and map view   	 
+		    marker = g.append('circle')
+		        .attr("class", "marker")
+		        .attr('cx', -30)
+		        .attr('cy', -30)
+		        .attr("r", 8)
 
 		    pathgroup = g.append("g")
 		        .attr("id", "pathgroup")
@@ -347,54 +366,33 @@
 		        return d.depth == selected_depth
 		    });
 
-		    //Find domain of data (user definable)
-		    data_min = user_data.reduce(function(p, v) {
-		        if (v.depth < p) return v.depth;
-		        return p;
-		    }, 1000000);
 
-		    data_max = user_data.reduce(function(p, v) {
-		        if (v.depth > p) return v.depth;
-		        return p;
-		    }, -1000000);
-
-		    /* 		console.log(data_max,data_min); */
-
-		    //add marker to map, later used to link paths and map view
-
-		    marker = g.append('circle')
-		        .attr("class", "marker")
-		        .attr('cx', -30)
-		        .attr('cy', -30)
-		        .attr("r", 8)
-
-
-
-		    // add circles to svg
+		    // add circles to map svg
 		    g.selectAll("circle")
-		        .data(slice_user_data).enter()
+		        .data(slice_user_data)
+		        .enter()
 		        .append("circle")
 		        .attr("class", 'data_node')
 		        .on("click", function(d, i) {
-/* 		            console.log(d.dist2path, d.selected); */
+/* 		            console.log(d.lat, d.lon, d.dist2path, d.selected); */
 		            if (d3.select(this).classed("selected_node")) {
-		                user_data[i].selected = false;
+/* 		                user_data[i].selected = false; */
 		                d3.select(this)
 		                    .classed("selected_node", false)
 		                    .classed("unselected_node", true)
-		                    .attr("r", "4px")
+/* 		                    .attr("r", "4px") */
 		            } else {
-		                user_data[i].selected = true;
+/* 		                user_data[i].selected = true; */
 		                d3.select(this)
 		                    .classed("selected_node", true)
 		                    .classed("unselected_node", false)
-		                    .attr("r", "6px")
+/* 		                    .attr("r", "6px") */
 
 		            }
 		            d3.event.stopPropagation();
 		        })
 		        .on("mouseover",function(d) {colorbarObject.pointTo(d.value)})
-		        .attr("cx", function(d) {
+		        .attr("cx", function(d,i) {
 		            return projection([d.lon, d.lat])[0];
 		        })
 		        .attr("cy", function(d) {
@@ -402,19 +400,13 @@
 		        })
 		        .attr("r", "6px")
 		        .attr("fill", function(d) {
-		            return color(d.value); //heatmap(c(d.value));
+		            return color(d.value); 
 		        })
-		        
-		        
-/* 				        myScale = d3.scale.linear().range(["red","white","blue"]).domain([0,4,25]) */
-		
-		
 	    
 
 		    //Bottom Plot Setup
 		    axes = d3.select(".container").append("svg")
 		        .attr("width", width + margin.right)
-		        //.attr("height", height + margin.top + margin.bottom)
 		        .attr("height", axis_height + margin.top + margin.bottom)
 		        .append("g")
 		        .attr("transform", "translate(20," + margin.top + ")");
