@@ -194,8 +194,10 @@
 
 		    if (nodes.length < 2) return;
 		    
+		    mapgroup = d3.select('#mapgroup');
+		    
 		    //Calculate distance from each data node to closest branch
-		    d3.selectAll('.data_node').each(function(d, i) {
+		    mapgroup.selectAll('.data_node').each(function(d, i) {
 
 		        d.dist2path = 10000;
 
@@ -218,10 +220,6 @@
 		        }
 
 		    })
-
-		    //Assign selected or unselected node classes according to calculated dist2path
-		    mapgroup = d3.select('#mapgroup');
-		    mapgroup.selectAll(".data_node")
 		        .classed("selected_node", function(d) {
 		            if (d.dist2path < path_tolerance) return true;
 		            return false;
@@ -324,6 +322,8 @@
 
 		    //Update position of all yaxis.    
 		    yaxes = axes.selectAll(".branch_y").data(y_axis);
+		    
+		    yaxes.exit().remove();
 
 		    yaxes
 		        .enter()
@@ -334,8 +334,8 @@
 		        })
 		        .each(function(d) {
 		            d3.select(this).call(d.axis)
-		        });
-
+		        })
+		        
 
 		    axes_rect = axes.selectAll(".axes_background").data(y_axis);
 
@@ -410,7 +410,9 @@
 		     //Update path nodes on  bottom plot 
 
 		    path_nodes = axes.selectAll(".path_node")
-		        .data(all_nodes);
+		        .data(all_nodes)
+		        
+		       path_nodes.exit().remove();
 
 		    path_nodes
 		        .enter()
@@ -430,7 +432,7 @@
 
 
 		    path_nodes.transition()
-/* 		        .duration(500).ease("sin-in-out") */
+		        .duration(100).ease("sin-in-out")
 		        .attr("cx", function(d) {
 		            return x(d.dist)
 		        })
@@ -471,22 +473,51 @@
 
 		    })
 
-/* 			return;  */
-
 		    //Update data nodes on bottom plot
+		    
+		    //Iterate through all data points and find "selected" points 
+		    
+		    
+		    	
+				/*
+data2 = user_data.filter(function(d) {
+		        
+		        	d.dist2path = 10000;
 
-		    // add points circles to bottom plot
-		    data_nodes = axes.selectAll(".data_node")
+			        path_handles.map(function(path_handle, i) {
+			            p = closestPoint(path_handle.node(), [projection([d.lon, d.lat])[0],
+			                projection([d.lon, d.lat])[1]
+			            ]);
+	
+			            if (p.distance < d.dist2path) {
+			                d.dist2path = p.distance;
+			                d.distalongpath = p.scanLength + branches[i].min_dist;;
+			                d.branch = i;
+			            }
+	
+			        });
+	
+	
+			        if (d.dist2path < path_tolerance) {
+			            return true;
+			        }
+			        	return false
+			});
+*/
+
+
+
+			  data_nodes = axes.selectAll(".data_node")
 		        .data(user_data.filter(function(d) {
 		            return d.selected
 		        }));
+		        
 
 		    if (data_nodes.length < 1)
 		        return;
 		    
 		    var val = d3.select('#select_color_axis')[0][0].value;
 		     
-		     console.log(val);
 		    data_nodes
 		        .enter()
 		        .append("circle")
@@ -506,7 +537,7 @@
 		            
 		          
 		        })
-		        .attr("r", "4px")
+		        .attr("r", "5px")
 		        .attr("fill", function(d) {
 			        if (val == 0)
 		            	return color(d.value)
@@ -525,12 +556,14 @@
 		        })
 		        .attr("cy", function(d) {
 		            if (selected_var == 0)
-		                return y_scales[d.branch](d.depth);
-
-		            return y_scales[d.branch](d.value) //y_scales[d.branch](d.value);
+		            	return y_scales[d.branch](d.depth);
+		            	
+	            	if (selected_var == 1)
+		            	return y_scales[d.branch](d.value);
+		            	
+	            	if (selected_var == 2)
+		            	return y_scales[d.branch](d.sal);
 		        })
-
-/* 				apply_color_scale() */
 
 		}
 

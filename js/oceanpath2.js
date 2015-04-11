@@ -332,24 +332,28 @@
 		        .append("circle")
 		        .attr("class", 'data_node')
 		        .on("click", function(d, i) {
-/* 		            console.log(d.lat, d.lon, d.dist2path, d.selected); */
+/*
 		            if (d3.select(this).classed("selected_node")) {
-/* 		                user_data[i].selected = false; */
+		                //user_data[i].selected = false;
 		                d3.select(this)
 		                    .classed("selected_node", false)
 		                    .classed("unselected_node", true)
-/* 		                    .attr("r", "4px") */
+		                    //.attr("r", "4px")
 		            } else {
-/* 		                user_data[i].selected = true; */
+		                //user_data[i].selected = true;
 		                d3.select(this)
 		                    .classed("selected_node", true)
 		                    .classed("unselected_node", false)
-/* 		                    .attr("r", "6px") */
+		                    //.attr("r", "6px")
 
 		            }
+*/
 		            d3.event.stopPropagation();
 		        })
-		        .on("mouseover",function(d) {colorbarObject.pointTo(d.value)})
+		        /*
+.on("mouseover",function(d) {
+		        	colorbarObject.pointTo(d.value)})
+*/
 		        .attr("cx", function(d,i) {
 		            return projection([d.lon, d.lat])[0];
 		        })
@@ -368,14 +372,6 @@
 		        .attr("height", axis_height + margin.top + margin.bottom)
 		        .append("g")
 		        .attr("transform", "translate(20," + margin.top + ")");
-
-		    /*
-	    	 		 axes.append("g")
-	    	        .attr("class", "axis axis--y")
-	    	        .attr("transform", "translate(-15,0)")
-	    	        .call(yAxis);
-	    */
-
 
 		    axes.append("g")
 		        .attr("class", "axis axis--x")
