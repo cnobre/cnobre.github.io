@@ -741,7 +741,8 @@
 
 
 
-		                if (branches.length == 6) {
+		                /*
+if (branches.length == 6) {
 
 		                    branches[0].level = 0;
 		                    branches[1].level = 2;
@@ -751,6 +752,7 @@
 		                    branches[5].level = 0;
 
 		                }
+*/
 
 
 		                ss.branches.push(curr_branch.order)

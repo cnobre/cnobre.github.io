@@ -154,7 +154,7 @@
 		
 		//Dropdown menu for Y Axis
 	    d3.select("#select_y_axis").on("change", function() {
-	        if (this.value < 1) {
+	        if (this.value == 0) {
 	
 	            //Find domain of data (user definable)
 	            data_min = user_data.reduce(function(p, v) {
@@ -172,19 +172,40 @@
 	            return;
 	        }
 	
-	        //Find domain of data (user definable)
-	        data_max = user_data.reduce(function(p, v) {
-	            if (v.value < p) return v.value;
-	            return p;
-	        }, 1000000);
-	
-	        data_min = user_data.reduce(function(p, v) {
-	            if (v.value > p) return v.value;
-	            return p;
-	        }, -1000000);
-	
-	
-	        selected_var = 1;
+			if (this.value == 1) {
+		        //Find domain of data (user definable)
+		        data_max = user_data.reduce(function(p, v) {
+		            if (v.value < p) return v.value;
+		            return p;
+		        }, 1000000);
+		
+		        data_min = user_data.reduce(function(p, v) {
+		            if (v.value > p) return v.value;
+		            return p;
+		        }, -1000000);
+		
+		
+		        selected_var = 1;
+	        }
+	        
+    		if (this.value == 2) {
+		        //Find domain of data (user definable)
+		        data_max = user_data.reduce(function(p, v) {
+		            if (v.sal < p) return v.sal;
+		            return p;
+		        }, 1000000);
+		
+		        data_min = user_data.reduce(function(p, v) {
+		            if (v.sal > p) return v.sal;
+		            return p;
+		        }, -1000000);
+		
+		
+		        selected_var = 2;
+	        }
+	        
+	        
+	        
 	        apply_pathway();
 	
 	
@@ -199,27 +220,15 @@
 	                return d.depth==0
 	            }));
 	            
-	            
-	       /*
-  data_nodes = d3.selectAll(".data_node")
-	            .data(user_data);
-*/
-	            
-	            
 	        var val = this.value; 
 	
-/* 			console.log(data_nodes); */
 	        data_nodes.transition()
-	            .duration(500).ease("sin-in-out")
-	              .attr("fill", function(d) {
-					 if (val == 0) {	                 
-					   return color(d.value) //heatmap(c(d.value));
-	                }
-	                
-	                if (val == 1) 
-	                  return color2(d.sal)
-	                
-	            })
+				.duration(500).ease("sin-in-out")
+				.attr("fill", function(d) {
+					if (val == 0) 	                 
+					return color(d.value) 
+					if (val == 1) 
+					return color2(d.sal)})
 	            
 	            if (val ==0){
 		            colorbar.scale(color);
@@ -230,9 +239,9 @@
 		            colorbar.scale(color2);
 	                colorbarObject.call(colorbar)
                 }
-
-	          data_nodes2 = axes.selectAll(".data_node")
-	            .data(user_data);
+			
+			data_nodes2 = axes.selectAll(".data_node")
+				.data(user_data);
 	
 	
 	        data_nodes2.transition()
