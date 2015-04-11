@@ -383,10 +383,10 @@
 				       }
 				   }
 				   
-/* 			Code for determining levels	    */
 				   
-/*
-				   //At least two nodes required for a branch
+				   
+	/*
+			   //At least two nodes required for a branch
 		            if (curr_branch.nodes.length > 1) {
 		                branches.push(curr_branch);
 
@@ -429,26 +429,13 @@
 
 		                branches[branches.length - 1].source_order = source_branch[0].order;
 
-		                /* 							branches[branches.length-1].level = branches[branches.length-1].order;	 */
+		                // 							branches[branches.length-1].level = branches[branches.length-1].order;	 
 						if (lr_curr_branch.slope < lr_source_branch.slope)
 							branches[branches.length-1].level = source_branch[0].level +1;
 						else
 							branches[branches.length-1].level = source_branch[0].level -1;
 
 
-
-		                /*
-if (branches.length == 6) {
-
-		                    branches[0].level = 0;
-		                    branches[1].level = 2;
-		                    branches[2].level = 1;
-		                    branches[3].level = 3;
-		                    branches[4].level = 2;
-		                    branches[5].level = 0;
-
-		                }
-*/
 
 
 		                ss.branches.push(curr_branch.order)

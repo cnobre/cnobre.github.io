@@ -61,7 +61,8 @@
         
         /*  All nodes representing data  */
         circle.data_node {
-/*             fill: red; */
+            stroke: black;
+/*             width: 10px; */
         }
         
         /*  All nodes within a distance from the path */        
@@ -130,7 +131,7 @@
         }
         
         .axes_background{
-	        opacity: 0.5;
+	        opacity: 0.2;
 	        fill:#a4bac7;
 	        
         }
