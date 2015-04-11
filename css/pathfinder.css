@@ -74,7 +74,7 @@
         
         /*  All nodes beyond the threshold distance from the path  */
         circle.unselected_node {
-            opacity: 0.1;
+            opacity: 0.6;
         }
         
         .graticule:nth-child(2n) {
