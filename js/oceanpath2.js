@@ -209,52 +209,10 @@
 	
 		//Dropdown menu for Color Axis
 		 d3.select("#select_color_axis").on("change", function() {
-	       
-	       console.log(this.value ==1)
-	        data_nodes = d3.selectAll(".data_node")
-	            .data(user_data.filter(function(d) {
-	                return d.depth==0
-	            }));
-	            
-	        var val = this.value; 
-	
-	        data_nodes.transition()
-				.duration(500).ease("sin-in-out")
-				.attr("fill", function(d) {
-					if (val == 0) 	                 
-					return color(d.value) 
-					if (val == 1) 
-					return color2(d.sal)})
-	            
-	            if (val ==0){
-		            colorbar.scale(color);
-	                colorbarObject.call(colorbar)
-                }
-                
-               if (val ==1){
-		            colorbar.scale(color2);
-	                colorbarObject.call(colorbar)
-                }
-			
-			data_nodes2 = axes.selectAll(".data_node")
-				.data(user_data);
-	
-	
-	        data_nodes2.transition()
-	            .duration(500).ease("sin-in-out")
-	              .attr("fill", function(d) {
-					 
-					if (val == 0) {	              
-	                return color(d.value) //heatmap(c(d.value));
-	                }
-	                
-	                if (val == 1){ 
-	                return color2(d.sal)
-	                }
-	            })
-	        		      
-	
+			 apply_color_scale()		     	
 	    });
+	    
+	    
 	    
 		    selected_depth = 0;
 		    selected_var = 0;

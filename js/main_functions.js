@@ -221,10 +221,7 @@
 
 		    //Assign selected or unselected node classes according to calculated dist2path
 		    mapgroup = d3.select('#mapgroup');
-		    mapgroup.selectAll(".data_node")/*
-
-		        .data(slice_user_data)
-*/
+		    mapgroup.selectAll(".data_node")
 		        .classed("selected_node", function(d) {
 		            if (d.dist2path < path_tolerance) return true;
 		            return false;
@@ -487,6 +484,9 @@
 		    if (data_nodes.length < 1)
 		        return;
 		    
+		    var val = d3.select('#select_color_axis')[0][0].value;
+		     
+		     console.log(val);
 		    data_nodes
 		        .enter()
 		        .append("circle")
@@ -508,7 +508,13 @@
 		        })
 		        .attr("r", "4px")
 		        .attr("fill", function(d) {
-		            return color(d.value) //heatmap(c(d.value));
+			        if (val == 0)
+		            	return color(d.value)
+		            	
+	            	if (val == 1)
+		            	return color2(d.sal)		            	
+	            		            	
+		            
 		        })
 
 
@@ -524,7 +530,7 @@
 		            return y_scales[d.branch](d.value) //y_scales[d.branch](d.value);
 		        })
 
-
+/* 				apply_color_scale() */
 
 		}
 

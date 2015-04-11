@@ -10,7 +10,51 @@
 				       }
 
 				   }
+				   
+				  function apply_color_scale() {
 
+			   	       data_nodes = d3.select('#mapgroup').selectAll(".data_node");
+				            
+				        var val = d3.select('#select_color_axis')[0][0].value; 
+						
+				        data_nodes.transition()
+							.duration(500).ease("sin-in-out")
+							.attr("fill", function(d) {
+								if (val == 0) 	                 
+								return color(d.value) 
+								if (val == 1) 
+								return color2(d.sal)})
+				            
+				            if (val ==0){
+					            colorbar.scale(color);
+				                colorbarObject.call(colorbar)
+			                }
+			                
+			               if (val ==1){
+					            colorbar.scale(color2);
+				                colorbarObject.call(colorbar)
+			                }
+						
+						
+						
+						data_nodes2 = axes.selectAll(".data_node")
+/* 							.data(user_data); */
+				
+				
+				        data_nodes2.transition()
+				            .duration(500).ease("sin-in-out")
+				              .attr("fill", function(d) {
+								 
+								if (val == 0) {	              
+				                return color(d.value) //heatmap(c(d.value));
+				                }
+				                
+				                if (val == 1){ 
+				                return color2(d.sal)
+				                }
+				            })
+			
+			};
 
 				   //Recursive function that returns true if the target_node can be found by following any paths starting @ start_node
 				   function has_node(start_node, target_node) {
@@ -385,63 +429,3 @@
 				   
 				   
 				   
-	/*
-			   //At least two nodes required for a branch
-		            if (curr_branch.nodes.length > 1) {
-		                branches.push(curr_branch);
-
-		                //find out which branch this node is a part of
-		                source_branch = branches.filter(function(branch) {
-		                    return (branch.nodes.filter(function(n) {
-		                        return n == s
-		                    }).length > 0);
-		                });
-
-		                target_node = source_branch[0].nodes.reduce(function(p, v, ind) {
-		                    if (v == s)
-		                        return ind
-		                    return p
-		                }, -1);
-
-
-		                if (target_node == source_branch[0].nodes.length - 1)
-		                    target_node = target_node - 1;
-
-
-		                //Fit a line between branching node and next (or previous) node in source branch
-		                lr_source_branch = linearRegression(
-		                    [nodes[source_branch[0].nodes[target_node]].y, nodes[source_branch[0].nodes[target_node + 1]].y], [nodes[source_branch[0].nodes[target_node]].x, nodes[source_branch[0].nodes[target_node + 1]].x]);
-
-		                lr_curr_branch = linearRegression(
-		                    [nodes[curr_branch.nodes[0]].y, nodes[curr_branch.nodes[1]].y], [nodes[curr_branch.nodes[0]].x, nodes[curr_branch.nodes[1]].x]);
-
-
-
-		                new_y = lr_source_branch.slope * nodes[curr_branch.nodes[1]].x + lr_source_branch.intercept;
-
-		                if (new_y < nodes[curr_branch.nodes[1]].y) {
-		                    branches[branches.length - 1].level = source_branch[0].level - 1;
-		                    branches[branches.length - 1].delta = -1;
-		                } else {
-		                    branches[branches.length - 1].level = source_branch[0].level + 1;
-		                    branches[branches.length - 1].delta = +1;
-		                }
-
-		                branches[branches.length - 1].source_order = source_branch[0].order;
-
-		                // 							branches[branches.length-1].level = branches[branches.length-1].order;	 
-						if (lr_curr_branch.slope < lr_source_branch.slope)
-							branches[branches.length-1].level = source_branch[0].level +1;
-						else
-							branches[branches.length-1].level = source_branch[0].level -1;
-
-
-
-
-		                ss.branches.push(curr_branch.order)
-		                ss.source_branch = source_branch[0].level;
-
-
-
-		            }
-*/
