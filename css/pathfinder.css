@@ -152,8 +152,12 @@
             cursor: cell;
         }
         
+        .axes_background:active{
+        	cursor: move;
+        	}
+        
                
-        circle:hover {
+        .path_node:hover {
             cursor: pointer;
         }
         line {

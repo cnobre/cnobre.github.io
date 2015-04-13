@@ -1,3 +1,14 @@
+		
+		
+		function load_page(){
+		
+			/* parse_user_data() */
+			
+			/* render_page(); */	
+
+		}
+		
+		
 		// Add node to end of branch/pathway
 		function add_node(d, i) {
 
@@ -167,13 +178,12 @@
 
 
 
-		    //Update along path distance for all nodes
+		    //Update along path distance for last node
 		    if (nodes.length > 1) {
 
 		        update_dist(path_handles);
 
 				apply_pathway()
-/* 		        update_scatter_plot(); */
 
 		        //Move circles to front
 		        var sel = d3.selectAll(".path_node")
@@ -189,35 +199,67 @@
 
 
 
-		function apply_pathway() {
-
-
-		    if (nodes.length < 2) return;
+		function apply_pathway(n1,n2) {
+		
+			if (nodes.length < 2) return;
 		    
+		    
+		    //Default to last path segment drawn
+	 		n1 = typeof n1 !== 'undefined' ? n1 : nodes[nodes.length - 1];
+	 		n2 = typeof n2 !== 'undefined' ? n2 : nodes[nodes[nodes.length - 1].incoming[0]];
+	 		
+	 		//Distance of segmeent between the two nodes
+	 		seg_dist = Math.sqrt(Math.pow(n1.x - n2.x,2) + Math.pow(n1.y - n2.y,2));
+	 		
+	 		//Determine minimum search radius from n1 and n2 that will incompass all points within the path_tolerance of the path
+	 		search_radius = Math.sqrt(Math.pow(seg_dist/2,2) + Math.pow(path_tolerance,2));
+
+
 		    mapgroup = d3.select('#mapgroup');
-		    
+
 		    //Calculate distance from each data node to closest branch
 		    mapgroup.selectAll('.data_node').each(function(d, i) {
 
-		        d.dist2path = 10000;
+				node_xy= projection([d.lon,d.lat]);
 
-		        path_handles.map(function(path_handle, i) {
-		            p = closestPoint(path_handle.node(), [projection([d.lon, d.lat])[0],
-		                projection([d.lon, d.lat])[1]
-		            ]);
-
-		            if (p.distance < d.dist2path) {
-		                d.dist2path = p.distance;
-		                d.distalongpath = p.scanLength + branches[i].min_dist;;
-		                d.branch = i;
-		            }
-
-		        });
+				n1_dist = Math.sqrt(Math.pow(n1.x - node_xy[0],2) + Math.pow(n1.y - node_xy[1],2));
+				n2_dist = Math.sqrt(Math.pow(n2.x - node_xy[0],2) + Math.pow(n2.y - node_xy[1],2));
+				
+				
+				//Node is within the desired distance to the path. 
+				if (n1_dist <= search_radius || n2_dist <= search_radius){
 
 
-		        if (d.dist2path < path_tolerance) {
-		            d.selected = true;
-		        }
+			        path_handles.map(function(path_handle, i) {
+			        	
+			        	
+			        	pathNode = path_handle.node();
+			        	pathLength = pathNode.getTotalLength(),
+			            no_items = pathNode.pathSegList.numberOfItems
+			            
+			            p = closestPoint(path_handle.node(), [projection([d.lon, d.lat])[0],
+			                projection([d.lon, d.lat])[1]
+			            ]);
+	
+			            if (p.distance < d.dist2path) {
+			                d.dist2path = p.distance;
+			                d.distalongpath = p.scanLength + branches[i].min_dist;;
+			                d.branch = i;
+			            }
+	
+			        });
+	
+	
+					//Not all nodes wthin a radius of path_tolerance from the end nodes are within path_tolerance of the
+					//line connecting this path segment. 
+					
+			        if (d.dist2path < path_tolerance) {
+			            d.selected = true;
+			        }
+			        
+			       }
+		        
+		        
 
 		    })
 		        .classed("selected_node", function(d) {
@@ -233,7 +275,7 @@
 		            return 4
 		        })
 
-		        
+/* 	console.log('found ' , snodes , ' nodes worth searching');		         */
 
 		    update_scatter_plot();  
 
@@ -301,10 +343,10 @@
 
 		        ys = d3.scale.linear()
 		            .range([y(branch.level + 0.1), y(branch.level + 0.8)])
-		            .domain([data_max, data_min])
+		            .domain([data_range[1], data_range[0]])
 		            .clamp(true);
-
-		        y_scales.push(ys);
+       
+       		        y_scales.push(ys);
 
 		        yax = d3.svg.axis()
 		            .scale(ys)
@@ -374,7 +416,14 @@
 		        .on("mouseout", function() {
 		            marker.attr('cx', -30)
 		                .attr('cy', -30);
-		        });
+		        })		        
+		        .on("mouseup", function(d, i) {
+		            xx = x.invert(d3.mouse(this)[0]);
+		            yy = Math.round(d.axis.scale().invert(d3.mouse(this)[1]));
+
+		           console.log(Math.ceil(y.invert(d3.mouse(this)[1])))
+		        })
+
 
 
 
@@ -475,95 +524,84 @@
 
 		    //Update data nodes on bottom plot
 		    
-		    //Iterate through all data points and find "selected" points 
+		    ddata=[];
+		    //for each selected node in the top plot, plot all depths below
+		    d3.select('#mapgroup').selectAll('.data_node').filter('.selected_node').each(function(d, i) {
 		    
-		    
+		    	for (var el in d.depths){
+			    	ddata.push({
+				    	branch:d.branch,
+				    	depth:d.depths[el].depth,
+				    	value:d.depths[el].value,
+				    	sal:d.depths[el].sal,
+				    	distalongpath:d.distalongpath
+			    	})
+			    	
+			   
+			    	
+		    	}
 		    	
-				/*
-data2 = user_data.filter(function(d) {
-		        
-		        	d.dist2path = 10000;
-
-			        path_handles.map(function(path_handle, i) {
-			            p = closestPoint(path_handle.node(), [projection([d.lon, d.lat])[0],
-			                projection([d.lon, d.lat])[1]
-			            ]);
-	
-			            if (p.distance < d.dist2path) {
-			                d.dist2path = p.distance;
-			                d.distalongpath = p.scanLength + branches[i].min_dist;;
-			                d.branch = i;
-			            }
-	
-			        });
-	
-	
-			        if (d.dist2path < path_tolerance) {
-			            return true;
-			        }
-			        	return false
-			});
-*/
-
-
-
-			  data_nodes = axes.selectAll(".data_node")
-		        .data(user_data.filter(function(d) {
-		            return d.selected
-		        }));
-		        
-
-		    if (data_nodes.length < 1)
-		        return;
-		    
-		    var val = d3.select('#select_color_axis')[0][0].value;
+    	   })
+		    	
+		    	data_nodes = axes.selectAll(".data_node")
+			        .data(ddata);
+			        
+			   var val = d3.select('#select_color_axis')[0][0].value;
 		     
-		    data_nodes
-		        .enter()
-		        .append("circle")
-		        .attr("class", 'data_node')
-		        .attr("cx", function(d) {
-		            return width;
-		        })
-		        .attr("cy", function(d) {
-		            if (selected_var == 0)
-		            	return y_scales[d.branch](d.depth);
-		            	
-	            	if (selected_var == 1)
-		            	return y_scales[d.branch](d.value);
-		            	
-	            	if (selected_var == 2)
-		            	return y_scales[d.branch](d.sal);
-		            
-		          
-		        })
-		        .attr("r", "5px")
-		        .attr("fill", function(d) {
-			        if (val == 0)
-		            	return color(d.value)
-		            	
-	            	if (val == 1)
-		            	return color2(d.sal)		            	
-	            		            	
-		            
-		        })
+			    data_nodes
+			        .enter()
+			        .append("circle")
+			        .attr("class", 'data_node')
+			        .attr("cx", function(d) {
+			            return x(d.distalongpath);
+			        })
+			        .attr("cy", function(dd) {
+			         	console.log(dd.depth, y_scales[dd.branch](dd.depth))
+			            if (selected_var == 0)
+			            	return y_scales[dd.branch](dd.depth);
+			            	
+		            	if (selected_var == 1)
+			            	return y_scales[dd.branch](dd.value);
+			            	
+		            	if (selected_var == 2)
+			            	return y_scales[dd.branch](dd.sal);
+			            
+			          
+			        })
+			        .attr("r", "5px")
+			        .attr("fill", function(d) {
+				        if (val == 0)
+			            	return color(d.value)
+			            	
+		            	if (val == 1)
+			            	return color2(d.sal)		            	
+		            		            	
+			            
+			        })
+		        
+		        
+		        
+			         data_nodes.transition()
+			       // .duration(500).ease("sin-in-out")
+			        .attr("cx", function(d) {
+			            return x(d.distalongpath);
+			        })
+			        .attr("cy", function(dd) {
+			            if (selected_var == 0)
+			            	return y_scales[dd.branch](dd.depth);
+			            	
+		            	if (selected_var == 1)
+			            	return y_scales[dd.branch](dd.value);
+			            	
+		            	if (selected_var == 2)
+			            	return y_scales[dd.branch](dd.sal);
+			        })
+	
 
+			        
+			        
 
-		    data_nodes.transition()
-/* 		        .duration(500).ease("sin-in-out") */
-		        .attr("cx", function(d) {
-		            return x(d.distalongpath);
-		        })
-		        .attr("cy", function(d) {
-		            if (selected_var == 0)
-		            	return y_scales[d.branch](d.depth);
-		            	
-	            	if (selected_var == 1)
-		            	return y_scales[d.branch](d.value);
-		            	
-	            	if (selected_var == 2)
-		            	return y_scales[d.branch](d.sal);
-		        })
+		 
 
 		}
 
@@ -581,7 +619,7 @@ data2 = user_data.filter(function(d) {
 		    if (valid_end_node.length < 1 & branches.length > 0)
 		        end_node = branches[0].nodes[branches[0].nodes.length - 1];
 
-		    branches = []; // empty branch vector, which will later be added to path object; 
+		    branches = []; // empty branch vector, ?? which will later be added to path object ??; 
 
 		    // Set all path segments to unvisited and all sources to false; 
 		    nodes.map(function(n) {
@@ -791,20 +829,6 @@ data2 = user_data.filter(function(d) {
 						else
 							branches[branches.length-1].level = source_branch[0].level -1;
 
-
-
-		                /*
-if (branches.length == 6) {
-
-		                    branches[0].level = 0;
-		                    branches[1].level = 2;
-		                    branches[2].level = 1;
-		                    branches[3].level = 3;
-		                    branches[4].level = 2;
-		                    branches[5].level = 0;
-
-		                }
-*/
 
 
 		                ss.branches.push(curr_branch.order)

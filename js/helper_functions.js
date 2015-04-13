@@ -21,9 +21,9 @@
 							.duration(500).ease("sin-in-out")
 							.attr("fill", function(d) {
 								if (val == 0) 	                 
-								return color(d.value) 
+								return color(d.mean_value) 
 								if (val == 1) 
-								return color2(d.sal)})
+								return color2(d.mean_sal)})
 				            
 				            if (val ==0){
 					            colorbar.scale(color);
@@ -121,7 +121,10 @@
 
 				   /* Calculate along track distance of nodes  */
 				   function update_dist(pathHandle) {
-
+				   
+				   	   //if no node_index is supplied, assume it's the most recently added one
+				   	   //i = typeof i !== 'undefined' ? i : nodes.length-1;
+				           
 				           //Cycle through all distances and set to -1
 				           nodes.map(function(n) {
 				               n.dist = -1;
@@ -136,16 +139,21 @@
 				               branches[j].total_distance = pathHandle[j].node().getTotalLength();
 
 				               for (i = 0; i < nodes.length; i++) {
+				                  
 				                   if (nodes[i].hasOwnProperty('x')) { //Node has not been deleted
 				                       p = closestPoint(pathHandle[j].node(), [nodes[i].x, nodes[i].y]);
+				                       
 				                       if (p.distance < 1) { //node is on path
 				                           if (nodes[i].dist < 0) { // node distance has not been computed yet 
+				                           	 
 				                               nodes[i].dist = p.scanLength; // + delta
 				                           } //end if nodes[i].dist < 0
 
 				                       } // end if p.distance < 1
 				                   } //end if nodes[i].hasOwnProperty('x')
-				               } // end for each nodes
+ 				              
+
+							  } // end for each nodes 
 
 				           } //end for each pathHandle
 
@@ -253,6 +261,12 @@
 
 
 				       draw_path()
+				       
+				       //Update along track distance of dragged node
+				       update_dist(path_handles,i)
+				       
+				       //Refresh "selected" data points around the moved node
+				       apply_pathway(n1,n2)
 
 				   }
 
@@ -389,7 +403,6 @@
 				       for (var scan, scanLength = 0, scanDistance; scanLength <= pathLength; scanLength += precision) {
 				           /*     	console.log('loop ', scan);  */
 				           if ((scanDistance = distance2(scan = pathNode.getPointAtLength(scanLength))) < bestDistance) {
-				               /*         	console.log ('scanDistance is ', scanDistance); */
 				               best = scan, bestLength = scanLength, bestDistance = scanDistance;
 				           }
 				       }

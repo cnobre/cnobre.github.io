@@ -109,3 +109,121 @@
 */
 
 
+		        
+		        
+/* 		        if (d.lon <= lon_range[1] & d.lon >= lon_range[0] & ) */
+		        
+		        /*
+var pathNode;
+
+								
+				if (i==1){
+				console.log(p1,p2);
+				console.log(lon_range,lat_range);
+				
+				node_xy= projection([d.lon,d.lat]);
+				node_dist = Math.sqrt(Math.pow(n1.x - node_xy[0],2) + Math.pow(n1.y - node_xy[1],2)); 
+				console.log(node_dist);
+				}
+				
+*/
+
+	 		
+	 		/*
+p1 = projection.invert([n1.x,n1.y]);
+			p2 = projection.invert([n2.x,n2.y]);
+			
+			
+			
+			lon_range = [(Math.min(p1[0],p2[0])), (Math.max(p1[0],p2[0]))];
+			lat_range= [(Math.min(p1[1],p2[1])),(Math.max(p1[1],p2[1]))];
+*/
+
+
+		        /*
+if (i==1){
+		        console.log(pathNode.pathSegList); 
+		        console.log(projection.invert([pathNode.pathSegList[0].x, pathNode.pathSegList[0].y]))
+		        }
+*/
+
+
+
+//Iterate through all data points and find "selected" points 
+		    
+		    
+		    	
+				/*
+data2 = user_data.filter(function(d) {
+		        
+		        	d.dist2path = 10000;
+
+			        path_handles.map(function(path_handle, i) {
+			            p = closestPoint(path_handle.node(), [projection([d.lon, d.lat])[0],
+			                projection([d.lon, d.lat])[1]
+			            ]);
+	
+			            if (p.distance < d.dist2path) {
+			                d.dist2path = p.distance;
+			                d.distalongpath = p.scanLength + branches[i].min_dist;;
+			                d.branch = i;
+			            }
+	
+			        });
+	
+	
+			        if (d.dist2path < path_tolerance) {
+			            return true;
+			        }
+			        	return false
+			});
+*/
+
+
+
+data_nodes = axes.selectAll(".data_node")
+		        .data(slice_user_data.filter(function(d) {
+		            return d.selected
+		        }));
+		        
+
+		    if (data_nodes.length < 1)
+		        return;
+		    
+		    var val = d3.select('#select_color_axis')[0][0].value;
+		     
+		    data_nodes
+		        .enter()
+		        .append("circle")
+		        .attr("class", 'data_node')
+		        .attr("cx", function(d) {
+		            return width;
+		        })
+		        .attr("cy", function(d) {
+		         console.log(y_scales[d.branch].domain(), y_scales[d.branch].range(), y_scales[d.branch](0));
+		         
+		            if (selected_var == 0)
+		            	return y_scales[d.branch](d.depths[0].depth);
+		            	
+	            	if (selected_var == 1)
+		            	return y_scales[d.branch](d.value);
+		            	
+	            	if (selected_var == 2)
+		            	return y_scales[d.branch](d.sal);
+		            
+		          
+		        })
+		        .attr("r", "5px")
+		        .attr("fill", function(d) {
+			        if (val == 0)
+		            	return color(d.value)
+		            	
+	            	if (val == 1)
+		            	return color2(d.sal)		            	
+	            		            	
+		            
+		        })
+
+
+
+

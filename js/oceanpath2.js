@@ -77,6 +77,11 @@
 
 		//Variables to store individual y_scales for each branch 
 		var y_scales = [];
+		
+		/*
+var scale = 1500; 
+		var circle_size = 6; 
+*/
 
 
 		//Line function that applies x and y scales to the inputs x and y attributes
@@ -147,55 +152,30 @@
 		//To store data
 		var user_data = [];
 		
+		depth_range = [0,30];
+		selected_var = 0;
+
+
+
+		
 		//Set callback functions for buttons and dropdown menus 
 		
 		//Dropdown menu for Y Axis
 	    d3.select("#select_y_axis").on("change", function() {
 	        if (this.value == 0) {
 	
-	            //Find domain of data (user definable)
-	            data_min = user_data.reduce(function(p, v) {
-	                if (v.depth < p) return v.depth;
-	                return p;
-	            }, 1000000);
-	
-	            data_max = user_data.reduce(function(p, v) {
-	                if (v.depth > p) return v.depth;
-	                return p;
-	            }, -1000000);
-	
-	            selected_var = 0;
+	           data_range = get_min_max(user_data,'depth');
+	           selected_var = 0;
 	            
 	        }
 	
 			if (this.value == 1) {
-		        //Find domain of data (user definable)
-		        data_max = user_data.reduce(function(p, v) {
-		            if (v.value < p) return v.value;
-		            return p;
-		        }, 1000000);
-		
-		        data_min = user_data.reduce(function(p, v) {
-		            if (v.value > p) return v.value;
-		            return p;
-		        }, -1000000);
-		
-		
+		        data_range = get_min_max(user_data,'value');		
 		        selected_var = 1;
 	        }
 	        
     		if (this.value == 2) {
-		        //Find domain of data (user definable)
-		        data_max = user_data.reduce(function(p, v) {
-		            if (v.sal < p) return v.sal;
-		            return p;
-		        }, 1000000);
-		
-		        data_min = user_data.reduce(function(p, v) {
-		            if (v.sal > p) return v.sal;
-		            return p;
-		        }, -1000000);
-		
+		        data_range = get_min_max(user_data,'sal');		
 		
 		        selected_var = 2;
 	        }
@@ -206,186 +186,44 @@
 	
 	
 	    });
-	
+	    
+			
+		//Dropdown menu for Dataset Option
+		 d3.select("#select_dataset").on("change", function() {
+		 
+		 return;
+			 
+			 if (this.value == 0) {
+			 
+			 			//Default to cruise dataset
+			user_data = cruise_data;
+			scale = 1500;
+			circle_size = 6;
+			
+  			//Once data is loaded, render page
+			render_page();
+			
+			 }
+			  if (this.value == 1) {
+			  
+			  			//Default to cruise dataset
+			user_data = gridded_data;
+			
+			scale =300;
+			circle_size = 4;
+			
+  			//Once data is loaded, render page
+			render_page();
+			 }
+			 
+			 
+			 		     	
+	    });
+	    
+
 		//Dropdown menu for Color Axis
 		 d3.select("#select_color_axis").on("change", function() {
 			 apply_color_scale()		     	
 	    });
 	    
 	    
-	    
-		    selected_depth = 0;
-		    selected_var = 0;
-
-
-		//Function that processes data after it is loaded by d3.json upon page load			
-		function render_page(){
-		    /* 	    map.call(zoom); */
-		    
-		    
-		    //Find domain of data 
-		    
-		    
-		    data_min = user_data.reduce(function(p, v) {
-		        if (v.depth < p) return v.depth;
-		        return p;
-		    }, 1000000);
-
-		    data_max = user_data.reduce(function(p, v) {
-		        if (v.depth > p) return v.depth;
-		        return p;
-		    }, -1000000);
-		    
-		
-		    value_min = user_data.reduce(function(p, v) {
-		        if (v.value < p) return v.value;
-		        return p;
-		    }, 1000000);
-
-		    value_max = user_data.reduce(function(p, v) {
-		        if (v.value > p) return v.value;
-		        return p;
-		    }, -1000000);
-
-			
-			sal_min = user_data.reduce(function(p, v) {
-		        if (v.sal < p) return v.sal;
-		        return p;
-		    }, 1000000);
-
-		   sal_max = user_data.reduce(function(p, v) {
-		        if (v.sal > p) return v.sal;
-		        return p;
-		    }, -1000000);
-
-
-			
-		    // Calculate mean lat and lon values for this dataset
-		    var mean_lat = user_data.reduce(function(p, v) {
-		        return p + v.lat;
-		    }, 0) / user_data.length;
-		    var mean_lon = user_data.reduce(function(p, v) {
-		        return p + v.lon;
-		    }, 0) / user_data.length;
-
-
-		    // set projection parameters
-		    projection
-		        .scale(1500)
-		        .center([mean_lon+2, mean_lat-.6])
-
-
-		    // create path variable
-		    var path = d3.geo.path()
-		        .projection(projection);
-
-		    var graticule = d3.geo.graticule();
-
-		    var g = svg.append("g")
-			    .attr("id", "mapgroup")
-
-		    g.append("path")
-		        .datum(graticule.outline)
-		        .attr("class", "background")
-		        .attr("d", path);
-
-		    g.append("g")
-		        .attr("class", "graticule")
-		        .selectAll("path")
-		        .data(graticule.lines)
-		        .enter().append("path")
-		        .attr("d", path);
-
-		    g.insert("path", ".graticule")
-		        .datum(topojson.mesh(worldtopo, worldtopo.objects.countries, function(a, b) {
-		            return a.id !== b.id;
-		        }))
-		        .attr("class", "boundary")
-		        .attr("d", path);
-
-		    g.insert("path", ".graticule")
-		        .datum(topojson.object(worldtopo, worldtopo.objects.land))
-		        .attr("class", "land")
-		        .attr("d", path);
-		       
-		     //add marker to map, later used to link paths and map view   	 
-		    marker = g.append('circle')
-		        .attr("class", "marker")
-		        .attr('cx', -30)
-		        .attr('cy', -30)
-		        .attr("r", 8)
-
-		    pathgroup = g.append("g")
-		        .attr("id", "pathgroup")
-
-
-			//Option to use a subset of the data by depth	
-		    slice_user_data = user_data.filter(function(d) {
-		        return d.depth == selected_depth
-		    });
-
-
-		    // add circles to map svg
-		    g.selectAll("circle")
-		        .data(slice_user_data)
-		        .enter()
-		        .append("circle")
-		        .attr("class", 'data_node')
-		        .on("click", function(d, i) {
-/*
-		            if (d3.select(this).classed("selected_node")) {
-		                //user_data[i].selected = false;
-		                d3.select(this)
-		                    .classed("selected_node", false)
-		                    .classed("unselected_node", true)
-		                    //.attr("r", "4px")
-		            } else {
-		                //user_data[i].selected = true;
-		                d3.select(this)
-		                    .classed("selected_node", true)
-		                    .classed("unselected_node", false)
-		                    //.attr("r", "6px")
-
-		            }
-*/
-		            d3.event.stopPropagation();
-		        })
-		        /*
-.on("mouseover",function(d) {
-		        	colorbarObject.pointTo(d.value)})
-*/
-		        .attr("cx", function(d,i) {
-		            return projection([d.lon, d.lat])[0];
-		        })
-		        .attr("cy", function(d) {
-		            return projection([d.lon, d.lat])[1];
-		        })
-		        .attr("r", "6px")
-		        .attr("fill", function(d) {
-		            return color(d.value); 
-		        })
-	    
-
-		    //Bottom Plot Setup
-		    axes = d3.select(".container").append("svg")
-		        .attr("width", width + margin.right)
-		        .attr("height", axis_height + margin.top + margin.bottom)
-		        .append("g")
-		        .attr("transform", "translate(20," + margin.top + ")");
-
-		    axes.append("g")
-		        .attr("class", "axis axis--x")
-		        .attr("transform", "translate(0," + (axis_height + 10) + ")")
-		        .call(xAxis);
-
-		    axes.append("text") // text label for the x axis
-		        .attr("transform", "translate(" + (width / 2) + " ," + (axis_height + margin.bottom / 1.2) + ")")
-		        .style("text-anchor", "middle")
-		        .text("Along Track Distance");
-
-
-		  
-
-		   
-		    
-};
