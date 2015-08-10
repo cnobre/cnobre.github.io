@@ -1,21 +1,9 @@
-
 		
-		.white_label{
-/* 		color:white; */
-		background-color: rgba(200,200,200,0.8);
-		padding:5px;
+       .map {
+		  position: relative;
+		  overflow: hidden;
+		
 		}
-		
-		.ol-overviewmap-box{
-		border:3px dotted rgba(255,0,0,0.7) !important}
-		
-		.custo,-scale-line, {
-        bottom: auto;
-        left: auto;
-        right: 0;
-        top: 0;
-      }
-      
 		
 		.layer {
 		  position: absolute;
@@ -28,41 +16,22 @@
 		  height: 256px;
 		}
 		
-/*
 		.info {
 		  position: absolute;
-		  bottom: 10px;
-		  left: 10px;
+		  bottom: 320px;
+		  left: 40px;
+/* 		  background-color:'#0a3354'; */
+		  color:'0a3354';
+		  font-size: large;
+		  padding: 5px;
+		  stroke-color:black;
 		}
-*/
-		
-		
-	#info {
-        position: absolute;
-        height: 1px;
-        width: 1px;
-        z-index: 100;
-      }
-      .tooltip.in {
-        opacity: 1;
-        filter: alpha(opacity=100);
-      }
-      .tooltip.top .tooltip-arrow {
-        border-top-color: white;
-      }
-      .tooltip-inner {
-        border: 2px solid white;
-      }
-      
-      
 
-		html{height:100%}
-body{height:100%}
        
         .background {
 /*             fill: #a4bac7; */
-		fill:white;
-/* 			fill: #d5e0e6; */
+/* 		fill:white; */
+			fill: #d5e0e6;
         }
         .foreground {
             fill: none;
@@ -94,8 +63,8 @@ body{height:100%}
         
         /*  All nodes representing data  */
         circle.data_node {
-/*         pointer-events: none; */
-/*             fill: red; */
+            stroke: black;
+/*             width: 10px; */
         }
         
         /*  All nodes within a distance from the path */        
@@ -105,7 +74,7 @@ body{height:100%}
         
         /*  All nodes beyond the threshold distance from the path  */
         circle.unselected_node {
-            opacity: 0.2;
+            opacity: 0.6;
         }
         
         .graticule:nth-child(2n) {
@@ -183,8 +152,12 @@ body{height:100%}
             cursor: cell;
         }
         
+        .axes_background:active{
+        	cursor: move;
+        	}
+        
                
-        circle:hover {
+        .path_node:hover {
             cursor: pointer;
         }
         line {
@@ -194,7 +167,7 @@ body{height:100%}
         }
         
         .axis--x text {
-		  font: 10px sans-serif;
+		  font: 15px sans-serif;
 		}
 		
 		.axis--y text {
@@ -209,11 +182,11 @@ body{height:100%}
 		}
 		
 		input[type="range"] {
-/* 		    position:absolute; */
-/* 		    -webkit-transform: rotate(90deg); */
-/* 		    top:433px; */
-/* 		    left:-100px; */
-		    width:100%;
+		    position:absolute;
+		    -webkit-transform: rotate(90deg);
+		    top:433px;
+		    left:-100px;
+		    width:409px;
 		   
 		}
 		
@@ -225,13 +198,11 @@ body{height:100%}
 		}
 		
 		
-/*
 		input[type="file"], input[type="checkbox"], input[type="radio"], select {
 			
-			 width:30%;
+/* 			 width:30%; */
 			
 		}
-*/
 		
 		.grid .tick {
 		    stroke: lightgrey;
@@ -252,19 +223,4 @@ body{height:100%}
 			fill:white;
 			stroke:red;
 			opacity:.6;
-		}
-		
-		.add-node {
-		  top: 70px;
-		  left: .5em;
-		}
-		
-	   .remove-node {
-		  top: 100px;
-		  left: .5em;
-		}
-		
-		
-		.ol-touch .rotate-north {
-		  top: 80px;
 		}

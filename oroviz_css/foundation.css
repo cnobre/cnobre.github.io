@@ -4152,6 +4152,7 @@ dialog {
   .has-tip.tip-left, .has-tip.tip-right {
     float: none !important; }
 
+/*
 .tooltip {
   display: none;
   position: absolute;
@@ -4187,6 +4188,7 @@ dialog {
   .tooltip.opened {
     color: #008cba !important;
     border-bottom: dotted 1px #003f54 !important; }
+*/
 
 .tap-to-close {
   display: block;

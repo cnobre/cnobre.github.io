@@ -26,6 +26,7 @@ meta.foundation-data-attribute-namespace {
 
 html, body {
   height: 100%; }
+  
 
 *,
 *:before,
@@ -6189,3 +6190,7 @@ th.hide-for-touch {
 
   th.show-for-print {
     display: table-cell !important; } }
+    
+.horizDiv {
+  float: left;
+}
