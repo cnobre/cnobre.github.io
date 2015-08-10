@@ -197,7 +197,7 @@ function create_map() {
 	    styles.push(new ol.style.Style({
 	      geometry: new ol.geom.Point(end),
 	      image: new ol.style.Icon({
-	        src: '../arrow_blue.png',
+	        src: 'arrow_blue.png',
 	        anchor: [0.75, 0.5],
 	        scale:.5,
 	        rotateWithView: false,
