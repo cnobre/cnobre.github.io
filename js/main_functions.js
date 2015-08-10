@@ -50,7 +50,7 @@
 
 		    cname = ["circle" + String(curr_path)];
 
-		    console.log(curr_path)
+/* 		    console.log(curr_path) */
 		    if (node_handles.length > curr_path)
 		        node_handles[curr_path].remove();
 
@@ -491,7 +491,6 @@
 		            /* 	            	console.log('d.branch for selected d is ', d.branch, d.depth); */
 		            if (selected_var == 0)
 		                return y_scales[d.branch](d.depth);
-
 		            return y_scales[d.branch](d.value) //y_scales[d.branch](d.value);
 		        })
 		        .attr("r", "4px")

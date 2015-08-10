@@ -113,13 +113,28 @@
 
 		/* Temperature Color Scale */
 		var color = d3.scale.linear()
-		    .domain([8, 6, 4, 2, 1, 0, -1, -1.2, -1.5, -1.7, -2])
-		    .range(["#67001f", "#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#f7f7f7", "#d1e5f0", "#92c5de", "#4393c3", "#2166ac", "#053061"])
+/* 		    .domain([8, 6, 4, 2, 1, 0, -1, -1.2, -1.5, -1.7, -2]) */
+		    .domain([-2, -1.7,-1.5, -1.2, -1, 0, 1, 2, 4, 6, 8]) 
+		   /*  .range(["#67001f", "#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#f7f7f7", "#d1e5f0", "#92c5de", "#4393c3", "#2166ac", "#053061"]) */
+		    .range(["#053061", "#2166ac", "#4393c3", "#92c5de", "#d1e5f0", "#f7f7f7", "#fddbc7", "#f4a582", "#d6604d" , "#b2182b", "#67001f"])
 
 	  /* Salinity  Color Scale */
 		var color2 = d3.scale.linear()
 			.domain([27.5, 29, 30, 31, 32, 33.5])
 		    .range(["#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#b10026"])
+
+
+		var colorbar = Colorbar()
+		    .origin([15,60])
+		    .scale(color)
+		    .orient("horizontal")
+		    .thickness(10)
+		    .barlength(width)
+		
+		placeholder = "#cmap"
+		
+		var colorbarObject = d3.select(placeholder)
+		    .call(colorbar)
 
 
 		// set projection
@@ -240,6 +255,8 @@
 		//Function that processes data after it is loaded by d3.json upon page load			
 		function render_page(){
 		    /* 	    map.call(zoom); */
+		    
+		    
 		
 		    //Find domain of data (user definable)
 		    value_min = user_data.reduce(function(p, v) {
@@ -367,6 +384,7 @@
 		            }
 		            d3.event.stopPropagation();
 		        })
+		        .on("mouseover",function(d) {colorbarObject.pointTo(d.value)})
 		        .attr("cx", function(d) {
 		            return projection([d.lon, d.lat])[0];
 		        })
@@ -381,18 +399,7 @@
 		        
 /* 				        myScale = d3.scale.linear().range(["red","white","blue"]).domain([0,4,25]) */
 		
-		colorbar = Colorbar()
-		    .origin([15,60])
-		    .scale(color)
-		    .orient("horizontal")
-		    .thickness(10)
-		    .barlength(width)
 		
-		placeholder = "#cmap"
-		
-		colorbarObject = d3.select(placeholder)
-		    .call(colorbar)
-
 	    
 
 		    //Bottom Plot Setup
