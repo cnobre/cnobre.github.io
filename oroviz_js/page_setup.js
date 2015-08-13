@@ -21,6 +21,9 @@ var selected_data_points = [];
 var branch_no = -1;
 var max_dist = 0;
 
+branch_level = -1;
+
+
 //Variables to store individual y_scales for each branch 
 var y_scales = [];
 

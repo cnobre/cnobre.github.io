@@ -192,6 +192,7 @@ function create_map() {
 	    var dy = end[1] - start[1];
 	    var rotation = Math.atan2(dy, dx);
 	    
+	    
 	    //Only add arrow to last segment
 	    if (end[0] == geometry.getLastCoordinate()[0]){
 	    styles.push(new ol.style.Style({
@@ -346,6 +347,7 @@ function create_map() {
 			evt.feature.setId(branch_no);
 			evt.feature.set('order',branch_no); // for now, later sort by geographic location
 			evt.feature.set('color','black'); 
+			evt.feature.source=[]; //list of branch ids that branch from this one
 			
 			//Defaults settings. Will be overriden if necessary within the loop below	
 			evt.feature.starting_distance = 0; 
@@ -356,13 +358,16 @@ function create_map() {
 			source_pathway.getFeatures().every(function(existing_branch_feature,i){	
 						
 				//Reached last added feature, which is the new_branch		
-				if (i == source_pathway.getFeatures().length)
+				if (i == source_pathway.getFeatures().length-1){
+					console.log ( 'reached itself!',i)
 					return false;
+				}
+					
 				
 				
 				existing_branch_linestring = existing_branch_feature.getGeometry();
 				
-				//Check if start node of new branch intersects with the branch
+				//If start node of new branch does not intersects with the existing branch, return true to skip to the next branch
 				if (!existing_branch_linestring.intersectsExtent(new_branch_start_node.getExtent()))
 					return true
 					
@@ -400,6 +405,10 @@ function create_map() {
 					return false;	//this breaks out of the iteration through all the features				
 					
 				}
+				
+				//Otherwise, add new branch to the list of branches originate from this existing branch
+				existing_branch_feature.source.push(evt.feature.getId());
+				//console.log ( 'adding to source list');
 						
 				//Calculate distance of first node along the line it is branching off of
 				start_dist = formatLength(existing_branch_linestring, new_branch_start_node);
@@ -414,7 +423,16 @@ function create_map() {
 								
 			}) //end iteration through source_pathway features
 			
-
+			
+			source_pathway.getFeatures().map(function(branch){
+				//console.log ('building tree for branch ', branch.getId() ); 
+				 build_tree(branch)
+			})
+			
+			branch_level = -1;
+			//console.log('starting traversal');
+			inOrder(0)
+			
 			//Calculate distances of each measurement to line;     
             calculate_distances();
             update_scatter();
@@ -450,6 +468,8 @@ function create_map() {
 				update_scatter()
 
 			});
+			
+			 //console.log('Main branch has ' , source_pathway.getFeatureById(0).getGeometry().getCoordinates().length , 'nodes');
 			
             
         });
@@ -796,7 +816,7 @@ function update_scatter(){
 	            'y': branch.get('order')+0.1
 	        }];
 
-
+			//console.log('branch.order is', branch.order);
 	        scatterplot.append("path")
 	            .datum(branch_line)
 		        .attr("class", "track")
