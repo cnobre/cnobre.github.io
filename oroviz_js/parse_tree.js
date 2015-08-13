@@ -17,7 +17,7 @@ function build_tree(main_branch){
 		branch.angle = branch_angle;
 		
 		console.log ('main and branch angles are: ' , angles)
-		console.log(branch.angle)
+		//console.log(branch.angle)
 		
 		if (branch_angle< main_angle)
 			  left_branches.push(branch.getId()) //left = relative position on the scatter plot
@@ -41,7 +41,7 @@ function build_tree(main_branch){
 	main_branch.right = right_branches;
 	
 	  //console.log ('Branch ',main_branch.getId() , ' left: ' , main_branch.left)
-	  console.log ('Branch ',main_branch.getId() , ' right: ' , main_branch.left)
+	  //console.log ('Branch ',main_branch.getId() , ' right: ' , main_branch.right)
 	
 }
 
@@ -105,50 +105,43 @@ function get_angles(main_branch,branch){
 function getrightNode(node_id) {
 
 	var branch = source_pathway.getFeatureById(node_id) ; 
-	next_node = branch.right.pop();	
-	return next_node;
+	return branch.right.pop();	
 	
 }
 
 function getleftNode(node_id) {
 
 	var branch = source_pathway.getFeatureById(node_id) ; 
-	next_node = branch.left.pop();	
-	return next_node;
+	return branch.left.pop();	
 }
 
 
 
 //Recursive function for an in order traversal of branches 
 function inOrder (node_id) {
-  //console.log ('calling in order on branch)', node_id)
+  console.log( ' inOrder running for branch', node_id);
   
   var branch = source_pathway.getFeatureById(node_id);
   
-  next_node = getleftNode(node_id);
+  next_node = getleftNode(node_id) ;
   
-  //console.log('branch left node is ', next_node);
   //As long as there are still left nodes to be visited
-  if (next_node)
+  while (next_node){
   	inOrder(next_node)
-  
-  //console.log ('after call to left node, branch is: ', branch.getId(), node_id)
-  //increment branch counter and assign level to node
-  branch.set('order',++branch_level);
-  console.log(branch.getId(), branch_level);
-  
-  //console.log('branch ' , branch.getId() , 'is @ order ', branch_level);
-  
-  next_node = getrightNode(node_id);
-  //console.log('branch right node is ', next_node);
-  //As long as there are still right nodes to be visited
-  if (next_node){
-  	console.log ('right node ', node_id)
-  	inOrder(next_node)
-  branch.set('order',++branch_level);
-  console.log(branch.getId(), branch_level);
+  	next_node = getleftNode(node_id) ;
   }
   	
-  	//console.log('returning inOrder')
+  
+  //increment branch counter and assign level to node
+  branch.set('order',++branch_level);
+  console.log('set' , branch.getId(), ' level to ',  branch_level);
+  
+  next_node = getrightNode(node_id) ;
+    //As long as there are still right nodes to be visited
+   while (next_node){
+  	inOrder(next_node)
+  	next_node = getrightNode(node_id) ;
+  }
+  
   
 }

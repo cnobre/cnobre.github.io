@@ -359,7 +359,7 @@ function create_map() {
 						
 				//Reached last added feature, which is the new_branch		
 				if (i == source_pathway.getFeatures().length-1){
-					console.log ( 'reached itself!',i)
+					//console.log ( 'reached itself!',i)
 					return false;
 				}
 					
@@ -907,6 +907,8 @@ function update_scatter(){
 		        .on("mousemove", function(d, i) {
 		            xx = xScale.invert(d3.mouse(this)[0]);
 		            yy = Math.floor(branch_yScale.invert(d3.mouse(this)[1]));
+		            
+		            console.log( 'branch level ', yy);
 					
 		        })
 		        .on("mouseout", function() {
