@@ -160,12 +160,14 @@ function create_map() {
     var path_style = function(feature, resolution) {
 		var geometry = feature.getGeometry();
 		var styles = [
-		   new ol.style.Style({
+		  /*
+ new ol.style.Style({
 		    stroke: new ol.style.Stroke({
 		      color: '#073A68',
 		      width: -1
 		    })
 		  }),
+*/
 		  new ol.style.Style({
 		    image: new ol.style.Circle({
 		      radius: 5,
