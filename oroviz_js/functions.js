@@ -163,7 +163,7 @@ function create_map() {
 		   new ol.style.Style({
 		    stroke: new ol.style.Stroke({
 		      color: '#073A68',
-		      width: 4
+		      width: -1
 		    })
 		  }),
 		  new ol.style.Style({
@@ -290,7 +290,7 @@ function create_map() {
                 color: 'rgba(255, 255, 255, 0.2)'
             }),
             stroke: new ol.style.Stroke({
-                color: '#ffcc33',
+                color: '#073A68',
                 width: 4
             }),
             image: new ol.style.Circle({
@@ -303,7 +303,23 @@ function create_map() {
 
     
     var collection = new ol.Collection();
-	featureOverlay = new ol.layer.Vector({
+    var collection2 = new ol.Collection();
+
+
+
+
+	bezierOverlay = new ol.layer.Vector({
+	  map: map,
+	  source: new ol.source.Vector({
+	    features: collection2,
+	    useSpatialIndex: false // optional, might improve performance
+	  }),
+	  style: overlayStyle,
+	  updateWhileAnimating: true, // optional, for instant visual feedback
+	  updateWhileInteracting: true // optional, for instant visual feedback
+	});
+	
+		featureOverlay = new ol.layer.Vector({
 	  map: map,
 	  source: new ol.source.Vector({
 	    features: collection,
@@ -424,18 +440,23 @@ function create_map() {
 			}) //end iteration through source_pathway features
 			
 			
-			source_pathway.getFeatures().map(function(branch){
-				//console.log ('building tree for branch ', branch.getId() ); 
-				 build_tree(branch)
-			})
-			
-			branch_level = -1;
-			//console.log('starting traversal');
-			inOrder(0)
-			
+			order_branches();
+						
 			//Calculate distances of each measurement to line;     
             calculate_distances();
             update_scatter();
+            
+            var line = turf.linestring(evt.feature.getGeometry().getCoordinates());
+            
+            var curved = turf.bezier(line);
+			//curved.properties = { stroke: '#0f0' };
+			
+			curve_feature = (new ol.format.GeoJSON()).readFeature(curved);
+			
+			bezierOverlay.getSource().addFeature(curve_feature)
+			//source_pathway.addFeature(curve_feature);
+			
+			console.log(curved)
 			
 			//Continuation of existing branch
 			if 	(!new_branch)			     
@@ -464,8 +485,23 @@ function create_map() {
 				//console.log('Branch ' , evt.target.get('order'), ' has a starting distance of ' , evt.target.starting_distance);
 				//console.log('Branch ' , evt.target.get('order'), ' has a max distance of ' , evt.target.max_distance);
 						
+				order_branches();
+						
 				calculate_distances()
 				update_scatter()
+				
+				var line = turf.linestring(evt.target.getGeometry().getCoordinates());
+            
+	            var curved = turf.bezier(line);
+				//curved.properties = { stroke: '#0f0' };
+				
+				curve_feature = (new ol.format.GeoJSON()).readFeature(curved);
+				
+				/*
+bezierOverlay.getSource().clear();
+				bezierOverlay.getSource().addFeature(curve_feature)
+
+*/
 
 			});
 			
@@ -907,6 +943,7 @@ function update_scatter(){
 		        .on("mousemove", function(d, i) {
 		            xx = xScale.invert(d3.mouse(this)[0]);
 		            yy = Math.floor(branch_yScale.invert(d3.mouse(this)[1]));
+		            
 		            
 		            console.log( 'branch level ', yy);
 					
