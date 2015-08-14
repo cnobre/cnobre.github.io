@@ -487,7 +487,7 @@ function create_map() {
 				//console.log('Branch ' , evt.target.get('order'), ' has a starting distance of ' , evt.target.starting_distance);
 				//console.log('Branch ' , evt.target.get('order'), ' has a max distance of ' , evt.target.max_distance);
 						
-				order_branches();
+				//order_branches();
 						
 				calculate_distances()
 				update_scatter()
@@ -495,16 +495,11 @@ function create_map() {
 				var line = turf.linestring(evt.target.getGeometry().getCoordinates());
             
 	            var curved = turf.bezier(line);
-				//curved.properties = { stroke: '#0f0' };
 				
 				curve_feature = (new ol.format.GeoJSON()).readFeature(curved);
+				modified_feature = collection2.item(evt.target.getId());
+				modified_feature.getGeometry().setCoordinates(curve_feature.getGeometry().getCoordinates());
 				
-				/*
-bezierOverlay.getSource().clear();
-				bezierOverlay.getSource().addFeature(curve_feature)
-
-*/
-
 			});
 			
 			 //console.log('Main branch has ' , source_pathway.getFeatureById(0).getGeometry().getCoordinates().length , 'nodes');
