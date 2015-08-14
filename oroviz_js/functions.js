@@ -288,7 +288,7 @@ function create_map() {
     map.addInteraction(select);
     
     
-    var someStyle = [new ol.style.Style({
+    var mainStyle = [new ol.style.Style({
             fill: new ol.style.Fill({
                 color: 'rgba(255, 255, 255, 0.2)'
             }),
@@ -359,6 +359,13 @@ function create_map() {
 
 
 
+	bezierLayer =new ol.layer.Vector({source: new ol.source.Vector()});
+	map.addLayer(bezierLayer); 
+	
+	
+	
+	  
+	  
 
 	bezierOverlay = new ol.layer.Vector({
 	  map: map,
@@ -461,8 +468,15 @@ function create_map() {
 					//Remove existing branch from featureOverlay 
 					featureOverlay.getSource().removeFeature(existing_branch_feature);
 					
-					//Remove new branch from featureOverlay and from source_pathway
+					//Remove new branch from featureOverlay, and source_pathway
 					featureOverlay.getSource().removeFeature(evt.feature);
+					
+					
+					//find  bezier feature for original branch
+					bezier_feature = bezierLayer.getSource().getFeatureById(existing_branch_feature.getId());
+									
+				
+					//bezierOverlay.getSource().removeFeature()
 					source_pathway.removeFeature(evt.feature);
 												
 					
@@ -477,7 +491,23 @@ function create_map() {
 					    existing_branch_feature.starting_distance + formatLength(existing_branch_linestring);
 					
 					//Add new, longer branch back to the featureOverlay
-					featureOverlay.getSource().addFeature(existing_branch_feature);							
+					featureOverlay.getSource().addFeature(existing_branch_feature);	
+					
+					
+			        var line = turf.linestring(existing_branch_linestring.getCoordinates());
+		            
+		            var curved = turf.bezier(line);					
+					curve_feature = (new ol.format.GeoJSON()).readFeature(curved);
+					curve_feature.setId(existing_branch_feature.getId());	
+					
+					
+					if (evt.feature.getId()==0)
+					    curve_feature.setStyle(mainStyle)
+					else
+						curve_feature.setStyle(otherStyle)
+					
+					bezier_feature.getGeometry().setCoordinates(curve_feature.getGeometry().getCoordinates());
+													
 					
 					new_branch = false;
 					
@@ -509,6 +539,11 @@ function create_map() {
             calculate_distances();
             update_scatter();
             
+			//Continuation of existing branch
+			if 	(!new_branch)			     
+				return;
+				
+            
             var line = turf.linestring(evt.feature.getGeometry().getCoordinates());
             
             var curved = turf.bezier(line);
@@ -519,17 +554,17 @@ function create_map() {
 			
 			
 			if (evt.feature.getId()==0)
-			    curve_feature.setStyle(someStyle)
+			    curve_feature.setStyle(mainStyle)
 			else
 				curve_feature.setStyle(otherStyle)
 			
-			bezierOverlay.getSource().addFeature(curve_feature)
-			//source_pathway.addFeature(curve_feature);
+			console.log('adding bezier curve with id ', curve_feature.getId())
+			//bezierOverlay.getSource().addFeature(curve_feature)
+			bezierLayer.getSource().addFeature(curve_feature);
 			
-						//Continuation of existing branch
-			if 	(!new_branch)			     
-				return;
-				
+			//console.log('retrieving  bezier curve with id ', curve_feature.getId())
+			
+		
 				
 			//Set listener for changes to this feature
 			evt.feature.on('change',function(evt){
@@ -560,7 +595,8 @@ function create_map() {
 	            var curved = turf.bezier(line);
 				
 				curve_feature = (new ol.format.GeoJSON()).readFeature(curved);
-				modified_feature = collection2.item(evt.target.getId());
+				//modified_feature = collection2.item(evt.target.getId());
+				modified_feature = bezierLayer.getSource().getFeatureById(evt.target.getId())
 				modified_feature.getGeometry().setCoordinates(curve_feature.getGeometry().getCoordinates());
 				
 			});
