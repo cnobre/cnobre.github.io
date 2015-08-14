@@ -293,7 +293,7 @@ function create_map() {
                 color: 'rgba(255, 255, 255, 0.2)'
             }),
             stroke: new ol.style.Stroke({
-                color: 'red',
+                color: '#E74925',
                 width: 6
             }),
             image: new ol.style.Circle({
@@ -420,16 +420,10 @@ function create_map() {
 			
 			//Create a feature id for new branch
 			evt.feature.setId(branch_no);
-
-				
-		   
-			evt.feature.set('order',branch_no); // for now, later sort by geographic location
+			//evt.feature.set('order',branch_no); // for now, later sort by geographic location
 			 
 			
-			if (branch_no == 0)
-				evt.feature.set('color','red')
-			else
-			    evt.feature.set('color','black');
+			
 				
 			evt.feature.source=[]; //list of branch ids that branch from this one
 			
@@ -446,9 +440,7 @@ function create_map() {
 					//console.log ( 'reached itself!',i)
 					return false;
 				}
-					
-				
-				
+	
 				existing_branch_linestring = existing_branch_feature.getGeometry();
 				
 				//If start node of new branch does not intersects with the existing branch, return true to skip to the next branch
@@ -494,15 +486,8 @@ function create_map() {
 					
 			        var line = turf.linestring(existing_branch_linestring.getCoordinates());
 		            
-		            var curved = turf.bezier(line);					
-					curve_feature = (new ol.format.GeoJSON()).readFeature(curved);
-					curve_feature.setId(existing_branch_feature.getId());	
-					
-					
-					if (evt.feature.getId()==0)
-					    curve_feature.setStyle(mainStyle)
-					else
-						curve_feature.setStyle(otherStyle)
+		            				
+					curve_feature = (new ol.format.GeoJSON()).readFeature(turf.bezier(line));
 					
 					bezier_feature.getGeometry().setCoordinates(curve_feature.getGeometry().getCoordinates());
 													
@@ -532,7 +517,7 @@ function create_map() {
 			
 			
 			order_branches();
-						
+									
 			//Calculate distances of each measurement to line;     
             calculate_distances();
             update_scatter();
@@ -551,10 +536,14 @@ function create_map() {
 			curve_feature.setId(evt.feature.getId());	
 			
 			
-			if (evt.feature.getId()==0)
+			if (evt.feature.getId()== evt.feature.origin_id){ //main branch
 			    curve_feature.setStyle(mainStyle)
-			else
+			    evt.feature.set('color','#E74925')
+			}
+			else{ //aux branch
 				curve_feature.setStyle(otherStyle)
+				evt.feature.set('color','#073A68');
+			}
 			
 			console.log('adding bezier curve with id ', curve_feature.getId())
 			//bezierOverlay.getSource().addFeature(curve_feature)
