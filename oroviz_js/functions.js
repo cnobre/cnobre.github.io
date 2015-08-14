@@ -287,12 +287,62 @@ function create_map() {
 
     map.addInteraction(select);
     
-    var overlayStyle = new ol.style.Style({
+    
+    var someStyle = [new ol.style.Style({
+            fill: new ol.style.Fill({
+                color: 'rgba(255, 255, 255, 0.2)'
+            }),
+            stroke: new ol.style.Stroke({
+                color: 'red',
+                width: 4
+            }),
+            image: new ol.style.Circle({
+                radius: 7,
+                fill: new ol.style.Fill({
+                    color: '#ffcc33'
+                })
+            })
+        })
+];
+  var otherStyle = [new ol.style.Style({
             fill: new ol.style.Fill({
                 color: 'rgba(255, 255, 255, 0.2)'
             }),
             stroke: new ol.style.Stroke({
                 color: '#073A68',
+                width: 4
+            }),
+            image: new ol.style.Circle({
+                radius: 7,
+                fill: new ol.style.Fill({
+                    color: '#ffcc33'
+                })
+            })
+        })
+];
+
+
+    var overlayStyle = (function() {
+    return function(feature, resolution) {
+  	console.log(sketch.getId())
+    if (sketch.getId() === 0) {
+    	console.log('main branch style');
+      return someStyle;
+    } else {
+      return otherStyle;
+    }
+  };
+}())
+
+
+
+    
+    var overlayStyle2 = new ol.style.Style({
+            fill: new ol.style.Fill({
+                color: 'rgba(255, 255, 255, 0.2)'
+            }),
+            stroke: new ol.style.Stroke({
+                color: 'red',
                 width: 4
             }),
             image: new ol.style.Circle({
@@ -316,7 +366,7 @@ function create_map() {
 	    features: collection2,
 	    useSpatialIndex: false // optional, might improve performance
 	  }),
-	  style: overlayStyle,
+	  //style: overlayStyle,
 	  updateWhileAnimating: true, // optional, for instant visual feedback
 	  updateWhileInteracting: true // optional, for instant visual feedback
 	});
@@ -359,12 +409,23 @@ function create_map() {
 			var new_branch_start_node = new ol.geom.Point(new_branch_linestring.getFirstCoordinate());
 			var new_branch_end_node = new ol.geom.Point(new_branch_linestring.getLastCoordinate());
 					
-			++branch_no;
+			/*
+++branch_no;
 			
 			//Create a feature id for new branch
 			evt.feature.setId(branch_no);
+*/
+
+				
+		   
 			evt.feature.set('order',branch_no); // for now, later sort by geographic location
-			evt.feature.set('color','black'); 
+			 
+			
+			if (branch_no == 0)
+				evt.feature.set('color','red')
+			else
+			    evt.feature.set('color','black');
+				
 			evt.feature.source=[]; //list of branch ids that branch from this one
 			
 			//Defaults settings. Will be overriden if necessary within the loop below	
@@ -454,13 +515,18 @@ function create_map() {
 			//curved.properties = { stroke: '#0f0' };
 			
 			curve_feature = (new ol.format.GeoJSON()).readFeature(curved);
+			curve_feature.setId(evt.feature.getId());	
+			
+			
+			if (evt.feature.getId()==0)
+			    curve_feature.setStyle(someStyle)
+			else
+				curve_feature.setStyle(otherStyle)
 			
 			bezierOverlay.getSource().addFeature(curve_feature)
 			//source_pathway.addFeature(curve_feature);
 			
-			console.log(curved)
-			
-			//Continuation of existing branch
+						//Continuation of existing branch
 			if 	(!new_branch)			     
 				return;
 				
@@ -483,10 +549,7 @@ function create_map() {
 					
 				evt.target.starting_distance = start_dist + origin_branch_feature.starting_distance;
 				evt.target.max_distance = evt.target.starting_distance + formatLength(curr_branch_linestring);
-				
-				//console.log('Branch ' , evt.target.get('order'), ' has a starting distance of ' , evt.target.starting_distance);
-				//console.log('Branch ' , evt.target.get('order'), ' has a max distance of ' , evt.target.max_distance);
-						
+									
 				//order_branches();
 						
 				calculate_distances()
@@ -537,6 +600,11 @@ function create_map() {
 
         draw.on('drawstart',
             function(evt) {
+            
+             ++branch_no;
+			
+			//Create a feature id for new branch
+			evt.feature.setId(branch_no);
                 // set sketch
                 sketch = evt.feature;
             }, this);
