@@ -148,12 +148,23 @@ function inOrder (node_id) {
 
 
 function order_branches(){
+
+     to_order =[];
 	//Build tree and traverse to determine order of branches
 	source_pathway.getFeatures().map(function(branch){
 		 build_tree(branch)
+		 if (branch.origin_id == branch.getId())
+		 	to_order.push(branch.getId());
 	})
 	
+	console.log(to_order);
+	
 	branch_level = -1;
-	inOrder(0)
+	to_order.map(function(id){
+			//parse out levels for all path trees
+	inOrder(id)
+		
+	})
+
 	
 }

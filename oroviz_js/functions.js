@@ -294,7 +294,7 @@ function create_map() {
             }),
             stroke: new ol.style.Stroke({
                 color: 'red',
-                width: 4
+                width: 6
             }),
             image: new ol.style.Circle({
                 radius: 7,
@@ -416,12 +416,10 @@ function create_map() {
 			var new_branch_start_node = new ol.geom.Point(new_branch_linestring.getFirstCoordinate());
 			var new_branch_end_node = new ol.geom.Point(new_branch_linestring.getLastCoordinate());
 					
-			/*
-++branch_no;
+			++branch_no;
 			
 			//Create a feature id for new branch
 			evt.feature.setId(branch_no);
-*/
 
 				
 		   
@@ -637,11 +635,7 @@ function create_map() {
         draw.on('drawstart',
             function(evt) {
             
-             ++branch_no;
-			
-			//Create a feature id for new branch
-			evt.feature.setId(branch_no);
-                // set sketch
+           // set sketch
                 sketch = evt.feature;
             }, this);
 
