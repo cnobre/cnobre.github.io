@@ -288,7 +288,7 @@ function create_map() {
     map.addInteraction(select);
     
     
-    var mainStyle = [new ol.style.Style({
+    mainStyle = [new ol.style.Style({
             fill: new ol.style.Fill({
                 color: 'rgba(255, 255, 255, 0.2)'
             }),
@@ -304,13 +304,30 @@ function create_map() {
             })
         })
 ];
-  var otherStyle = [new ol.style.Style({
+   otherStyle = [new ol.style.Style({
             fill: new ol.style.Fill({
                 color: 'rgba(255, 255, 255, 0.2)'
             }),
             stroke: new ol.style.Stroke({
                 color: '#073A68',
                 width: 4
+            }),
+            image: new ol.style.Circle({
+                radius: 7,
+                fill: new ol.style.Fill({
+                    color: '#ffcc33'
+                })
+            })
+        })
+];
+
+  selectedStyle = [new ol.style.Style({
+            fill: new ol.style.Fill({
+                color: 'rgba(255, 255, 255, 0.2)'
+            }),
+            stroke: new ol.style.Stroke({
+                color: '#073A68',
+                width: 8
             }),
             image: new ol.style.Circle({
                 radius: 7,
@@ -355,29 +372,11 @@ function create_map() {
 
     
     var collection = new ol.Collection();
-    var collection2 = new ol.Collection();
-
-
 
 	bezierLayer =new ol.layer.Vector({source: new ol.source.Vector()});
 	map.addLayer(bezierLayer); 
 	
-	
-	
-	  
-	  
 
-	bezierOverlay = new ol.layer.Vector({
-	  map: map,
-	  source: new ol.source.Vector({
-	    features: collection2,
-	    useSpatialIndex: false // optional, might improve performance
-	  }),
-	  //style: overlayStyle,
-	  updateWhileAnimating: true, // optional, for instant visual feedback
-	  updateWhileInteracting: true // optional, for instant visual feedback
-	});
-	
 		featureOverlay = new ol.layer.Vector({
 	  map: map,
 	  source: new ol.source.Vector({
@@ -466,7 +465,6 @@ function create_map() {
 					bezier_feature = bezierLayer.getSource().getFeatureById(existing_branch_feature.getId());
 									
 				
-					//bezierOverlay.getSource().removeFeature()
 					source_pathway.removeFeature(evt.feature);
 												
 					
@@ -500,8 +498,7 @@ function create_map() {
 				
 				//Otherwise, add new branch to the list of branches originate from this existing branch
 				existing_branch_feature.source.push(evt.feature.getId());
-				//console.log ( 'adding to source list');
-						
+
 				//Calculate distance of first node along the line it is branching off of
 				start_dist = formatLength(existing_branch_linestring, new_branch_start_node);
 				
@@ -526,14 +523,11 @@ function create_map() {
 			if 	(!new_branch)			     
 				return;
 				
-            
+            //New Branch
             var line = turf.linestring(evt.feature.getGeometry().getCoordinates());
-            
-            var curved = turf.bezier(line);
-			//curved.properties = { stroke: '#0f0' };
-			
-			curve_feature = (new ol.format.GeoJSON()).readFeature(curved);
-			curve_feature.setId(evt.feature.getId());	
+
+			curve_feature = (new ol.format.GeoJSON()).readFeature(turf.bezier(line));
+			curve_feature.setId(evt.feature.getId());	//curved line and original line have same id()
 			
 			
 			if (evt.feature.getId()== evt.feature.origin_id){ //main branch
@@ -544,15 +538,9 @@ function create_map() {
 				curve_feature.setStyle(otherStyle)
 				evt.feature.set('color','#073A68');
 			}
-			
-			console.log('adding bezier curve with id ', curve_feature.getId())
-			//bezierOverlay.getSource().addFeature(curve_feature)
+
 			bezierLayer.getSource().addFeature(curve_feature);
-			
-			//console.log('retrieving  bezier curve with id ', curve_feature.getId())
-			
-		
-				
+							
 			//Set listener for changes to this feature
 			evt.feature.on('change',function(evt){
 			
@@ -587,10 +575,7 @@ function create_map() {
 				modified_feature.getGeometry().setCoordinates(curve_feature.getGeometry().getCoordinates());
 				
 			});
-			
-			 //console.log('Main branch has ' , source_pathway.getFeatureById(0).getGeometry().getCoordinates().length , 'nodes');
-			
-            
+			        
         });
         
 
@@ -1028,12 +1013,35 @@ function update_scatter(){
 		            xx = xScale.invert(d3.mouse(this)[0]);
 		            yy = Math.floor(branch_yScale.invert(d3.mouse(this)[1]));
 		            
+		            bezierLayer.getSource().getFeatures().map(function(feature){
+		            	line_feature = source_pathway.getFeatureById(feature.getId());
+		            /*
+	curve_style = feature.getStyle();
+		            	curve_sty
+*/
+			            if (line_feature.get('order') == yy)
+			            	feature.setStyle(selectedStyle)
+			            
+		            })
 		            
-		            console.log( 'branch level ', yy);
 					
 		        })
-		        .on("mouseout", function() {
-		           		        });
+		        .on("mouseout", function(d,i) {
+		        
+		        	yy = Math.floor(branch_yScale.invert(d3.mouse(this)[1]));
+		            
+		            bezierLayer.getSource().getFeatures().map(function(feature){
+		            	line_feature = source_pathway.getFeatureById(feature.getId())
+			            if (line_feature.get('order') == yy){
+			            	if (line_feature.getId() == line_feature.origin_id)
+			            		feature.setStyle(mainStyle)
+			            	else
+			            		feature.setStyle(otherStyle)
+			            	}
+			            
+		            })
+		        
+   		        });
 
 
 

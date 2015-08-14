@@ -23,6 +23,7 @@ var max_dist = 0;
 
 branch_level = -1;
 
+var mainStyle, otherstyle, selectedStyle;
 
 //Variables to store individual y_scales for each branch 
 var y_scales = [];
