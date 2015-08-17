@@ -1,143 +1,14 @@
-//CREATE SCATTER PLOT 
-function create_scatter() {
-
-    //Create padding for the x and y axis on the scatter plot
-    var xbuffer = (d3.max(data, xValue) - d3.min(data, xValue)) / 10;
-    var ybuffer = (d3.max(data, yValue) - d3.min(data, yValue)) / 10;
-
-    //Set Domains for the x an y scales
-
-    xScale.domain([d3.min(data, xValue) - xbuffer, d3.max(data, xValue) + xbuffer]);
-    yScale.domain([d3.min(data, yValue) - ybuffer, d3.max(data, yValue) + ybuffer]);
-
-
-    // x-axis
-    scatterplot.append("g")
-        .attr("class", "x axis ")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis)
-        .append("text")
-        .attr("x", width / 2)
-        .attr("y", 50)
-        .style("text-anchor", "end")
-        .text("Along Track Distance (km)")
-        .attr("class", "xlabel");
-
-    // y-axis
-    scatterplot.append("g")
-/*         .attr("class", "y axis") */
-/*         .call(yAxis) */
-        .append("text")
-        .attr("transform", "rotate(-90)")
-        //.attr("y", 0 – margin.left)
-        .attr("x", 0 - (height / 2))
-        .attr("y", -90)
-        .attr("dy", "1em")
-        .style("text-anchor", "middle")
-        .text("cs137 (decay corrected)")
-        .attr("class", "ylabel");
-
-
-    /*
-//Grid lines for scatter plot	
-    scatterplot.append("g")
-        .attr("class", "y axis grid")
-        .call(grid_axis
-            .tickSize(-width, 0, 0)
-            .tickFormat("")
-        )
-        .attr("opacity", .2)
-        .attr("stroke", "lightgrey")
-*/
-
-
-
-
-    // draw legend
-    legend = scatterplot.append("g")
-        .attr("transform", "translate(100,100)")
-
-    legend_box = scatterplot.append("g");
-
-
-};
-
-
-//CREATE MAP and range sliders 
-
+//Create Map and range sliders 
 function create_map() {
 
+    //Range Sliders for time and depth
+    var time_range = [d3.min(data, dateValue), d3.max(data, dateValue)];
+    var depth_range = [d3.min(data,depthValue), d3.max(data, depthValue)];
 
-    // Add Range Sliders
-    var time_range = [d3.min(data, function(d) {
-        return d.date
-    }), d3.max(data, function(d) {
-        return d.date
-    })];
-    var depth_range = [d3.min(data, function(d) {
-        return d.prs
-    }), d3.max(data, function(d) {
-        return d.prs
-    })];
-
-
-    tscale = d3.time.scale().domain([time_range]);
-
-
-/*
-    d3.select('#slider3').call(d3.slider()
-        .axis(d3.svg.axis().orient("bottom").ticks(5))
-        .scale(tscale)
-        .min(time_range[0])
-        .max(time_range[1])
-        .value(time_range)
-        .orientation("horizontal")
-        .on("slide", function(evt, value) {
-            d3.select('#slider3textmin').text(new Date(value[0]).toDateString());
-            d3.select('#slider3textmax').text(new Date(value[1]).toDateString());
-
-            selectedFeatures.clear();
-            map_data = all_data;
-
-            data = map_data.filter(function(el) {
-                return el.prs >= +d3.select('#slider4textmin').text() && el.prs <= +d3.select('#slider4textmax').text() && el.date >= new Date(d3.select('#slider3textmin').text()) && el.date <= new Date(d3.select('#slider3textmax').text())
-
-            });
-
-			//calculate_distances();
-            //update();
-
-
-        }))
-*/
+    tScale = d3.time.scale().domain([time_range]);
 
     d3.select('#slider3textmin').text(time_range[0].toDateString());
     d3.select('#slider3textmax').text(time_range[1].toDateString());
-
-   /*
- d3.select('#slider4').call(d3.slider()
-        .axis(d3.svg.axis().orient("bottom"))
-        .min(depth_range[0])
-        .max(depth_range[1])
-        .value(depth_range)
-        .orientation("horizontal")
-        .on("slide", function(evt, value) {
-            d3.select('#slider4textmin').text(Math.round(value[0]));
-            d3.select('#slider4textmax').text(Math.round(value[1]));
-
-            selectedFeatures.clear();
-            map_data = all_data;
-
-            data = map_data.filter(function(el) {
-                return el.prs >= +d3.select('#slider4textmin').text() && el.prs <= +d3.select('#slider4textmax').text() && el.date >= new Date(d3.select('#slider3textmin').text()) && el.date <= new Date(d3.select('#slider3textmax').text())
-
-            });
-
-			//calculate_distances();
-            //update();
-
-        }))
-*/
 
     d3.select('#slider4textmin').text(Math.round(depth_range[0]));
     d3.select('#slider4textmax').text(Math.round(depth_range[1]));
@@ -150,24 +21,25 @@ function create_map() {
     lin_logscale
         .domain([start, stop])
 		
-    //Setup Map
+    //Map Sources
     source_measurements = new ol.source.Vector({});
-    source_pathway = new ol.source.Vector({
-	    //features: collection
-    });
+    source_pathway = new ol.source.Vector({});
     path_marker = new ol.source.Vector({});
     
+    //Map Styles 
+    
+    
+    //style for path controle nodes and arrowhead   
     var path_style = function(feature, resolution) {
 		var geometry = feature.getGeometry();
 		var styles = [
-		  /*
- new ol.style.Style({
+		   new ol.style.Style({
 		    stroke: new ol.style.Stroke({
 		      color: '#073A68',
-		      width: -1
+		      width: 2,
+		      lineDash: [8,16]
 		    })
 		  }),
-*/
 		  new ol.style.Style({
 		    image: new ol.style.Circle({
 		      radius: 5,
@@ -213,16 +85,59 @@ function create_map() {
 	  return styles;
 	};
 	    
-    
-    
+	    
+	//Style for main_branch    
+    mainStyle = [new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: '#E74925',
+                width: 6
+            }),
+        })
+];
+	//Style for all other branches
+   otherStyle = [new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: '#073A68',
+                width: 4
+            }),
+        })
+];
 
+ //Style for highlighted branch
+  selectedStyle = [new ol.style.Style({
+            fill: new ol.style.Fill({
+                color: 'rgba(255, 255, 255, 0.2)'
+            }),
+            stroke: new ol.style.Stroke({
+                color: '#073A68',
+                width: 8
+            }),
+            image: new ol.style.Circle({
+                radius: 7,
+                fill: new ol.style.Fill({
+                    color: '#ffcc33'
+                })
+            })
+        })
+];
+
+     var withinPath_style = [new ol.style.Style({
+        image: new ol.style.Circle({
+            radius: 6,
+            stroke: new ol.style.Stroke({
+                color: 'white',
+                width: 2
+            })
+        }),
+    })];
+    
+  
     
     //Background Layer
     var ocean_floor = new ol.layer.Tile({
         source: new ol.source.XYZ({
             //attributions: [attribution],
             url: 'http://services.arcgisonline.com/arcgis/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}',
-            //wrapX: false //not doing anything?
         }),
          
     })
@@ -259,7 +174,6 @@ function create_map() {
         }),
         view: new ol.View({
             center: ol.proj.transform([-160, 42], 'EPSG:4326', 'EPSG:3857'),
-/* 			center: ol.proj.transform([-40, 36], 'EPSG:4326', 'EPSG:3857'), */
             zoom: 3
         })
     });
@@ -267,113 +181,20 @@ function create_map() {
     //When user zooms in, redraw "selected" points on map (to account for clustering)
     map.getView().on('change:resolution', function() {
         calculate_distances()
-/*         update_map() */
     })
 
-    var selected_style = [new ol.style.Style({
-        image: new ol.style.Circle({
-            radius: 6,
-            stroke: new ol.style.Stroke({
-                color: 'white',
-                width: 2
-            })
-        }),
-    })];
-
+  
     // a select interaction to handle points within pathways
     var select = new ol.interaction.Select({
-	        style: selected_style 
+	        style: withinPath_style 
         })
 
     map.addInteraction(select);
-    
-    
-    mainStyle = [new ol.style.Style({
-            fill: new ol.style.Fill({
-                color: 'rgba(255, 255, 255, 0.2)'
-            }),
-            stroke: new ol.style.Stroke({
-                color: '#E74925',
-                width: 6
-            }),
-            image: new ol.style.Circle({
-                radius: 7,
-                fill: new ol.style.Fill({
-                    color: '#ffcc33'
-                })
-            })
-        })
-];
-   otherStyle = [new ol.style.Style({
-            fill: new ol.style.Fill({
-                color: 'rgba(255, 255, 255, 0.2)'
-            }),
-            stroke: new ol.style.Stroke({
-                color: '#073A68',
-                width: 4
-            }),
-            image: new ol.style.Circle({
-                radius: 7,
-                fill: new ol.style.Fill({
-                    color: '#ffcc33'
-                })
-            })
-        })
-];
+   
 
-  selectedStyle = [new ol.style.Style({
-            fill: new ol.style.Fill({
-                color: 'rgba(255, 255, 255, 0.2)'
-            }),
-            stroke: new ol.style.Stroke({
-                color: '#073A68',
-                width: 8
-            }),
-            image: new ol.style.Circle({
-                radius: 7,
-                fill: new ol.style.Fill({
-                    color: '#ffcc33'
-                })
-            })
-        })
-];
+   var collection = new ol.Collection();
 
-
-    var overlayStyle = (function() {
-    return function(feature, resolution) {
-  	console.log(sketch.getId())
-    if (sketch.getId() === 0) {
-    	console.log('main branch style');
-      return someStyle;
-    } else {
-      return otherStyle;
-    }
-  };
-}())
-
-
-
-    
-    var overlayStyle2 = new ol.style.Style({
-            fill: new ol.style.Fill({
-                color: 'rgba(255, 255, 255, 0.2)'
-            }),
-            stroke: new ol.style.Stroke({
-                color: 'red',
-                width: 4
-            }),
-            image: new ol.style.Circle({
-                radius: 7,
-                fill: new ol.style.Fill({
-                    color: '#ffcc33'
-                })
-            })
-        })
-
-    
-    var collection = new ol.Collection();
-
-	bezierLayer =new ol.layer.Vector({source: new ol.source.Vector()});
+	bezierLayer =new ol.layer.Vector({source:new ol.source.Vector() });
 	map.addLayer(bezierLayer); 
 	
 
@@ -387,9 +208,6 @@ function create_map() {
 	  updateWhileAnimating: true, // optional, for instant visual feedback
 	  updateWhileInteracting: true // optional, for instant visual feedback
 	});
-	
-	//featureOverlay.getSource().addFeature(feature);
-	//featureOverlay.getSource().removeFeature(feature);
 
 
     var modify = new ol.interaction.Modify({
@@ -515,13 +333,14 @@ function create_map() {
 			
 			order_branches();
 									
-			//Calculate distances of each measurement to line;     
-            calculate_distances();
-            update_scatter();
-            
+		
 			//Continuation of existing branch
-			if 	(!new_branch)			     
+			if 	(!new_branch){	
+				//Calculate distances of each measurement to line;     
+	            calculate_distances();
+	            update_scatter();	     
 				return;
+				}
 				
             //New Branch
             var line = turf.linestring(evt.feature.getGeometry().getCoordinates());
@@ -540,6 +359,10 @@ function create_map() {
 			}
 
 			bezierLayer.getSource().addFeature(curve_feature);
+			
+			//Calculate distances of each measurement to line;     
+	            calculate_distances();
+	            update_scatter();
 							
 			//Set listener for changes to this feature
 			evt.feature.on('change',function(evt){
@@ -638,19 +461,21 @@ function create_map() {
         source_measurements.getFeatures().map(function(feature, i) { //source_measurements or clusterSource
         	
                 coordinate = feature.getGeometry().getCoordinates();
-                closestPath = source_pathway.getClosestFeatureToCoordinate(coordinate);
-                geometry = closestPath.getGeometry();
                 
-                closestPoint = geometry.getClosestPoint(coordinate);
+                closestCurve = bezierLayer.getSource().getClosestFeatureToCoordinate(coordinate);
+                closestPath = source_pathway.getClosestFeatureToCoordinate(coordinate);
+                
+                closestPointOnPath = closestPath.getGeometry().getClosestPoint(coordinate);
+                closestPointOnCurve = closestCurve.getGeometry().getClosestPoint(coordinate);
 
-                var feature_to_path_line = new ol.geom.LineString([coordinate, closestPoint]);
-                var output = formatLength(feature_to_path_line)
+                var feature_to_curve = new ol.geom.LineString([coordinate, closestPointOnCurve]);
+                var output = formatLength(feature_to_curve)
 
                 if (output < dist_threshold) {
 /*                     selectedFeatures.push(feature); */
                     d = feature.get('data');
                     d.along_track_distance = 
-                    	formatLength(geometry, new ol.geom.Point(closestPoint))+ closestPath.starting_distance ;
+                    	formatLength(closestPath.getGeometry(), new ol.geom.Point(closestPointOnPath))+ closestPath.starting_distance ;
                     d.branch = closestPath;
                     selected_data_points.push(d)
                     
@@ -662,7 +487,7 @@ function create_map() {
     clusterSource.getFeatures().map(function(feature, i) { //source_measurements or clusterSource
         	
                 coordinate = feature.getGeometry().getCoordinates();
-                closestPath = source_pathway.getClosestFeatureToCoordinate(coordinate);
+                closestPath = bezierLayer.getSource().getClosestFeatureToCoordinate(coordinate);
                 geometry = closestPath.getGeometry();
                 
                 closestPoint = geometry.getClosestPoint(coordinate);
@@ -680,8 +505,6 @@ function create_map() {
 
         if (selected_data_points.length > 1)
             data = selected_data_points;
-        
-        //update();
 
 
     }
@@ -817,8 +640,8 @@ function create_map() {
     
 
     var snap = new ol.interaction.Snap({
-        //source: source_pathway;
-        features: collection        
+        features: collection
+        //source: bezierLayer.getSource()       
     });
 
     map.addInteraction(snap);
@@ -848,8 +671,6 @@ function update_scatter(){
 
     xAxis.scale(xScale)
     //yAxis.scale(yScale)
-
-    //grid_axis.scale(yScale)
 
     //Update scatter plot axis
     selectValue = d3.select('#select_y_axis').property('value');
@@ -1013,16 +834,16 @@ function update_scatter(){
 		            xx = xScale.invert(d3.mouse(this)[0]);
 		            yy = Math.floor(branch_yScale.invert(d3.mouse(this)[1]));
 		            
-		            bezierLayer.getSource().getFeatures().map(function(feature){
+		           /*
+ bezierLayer.getSource().getFeatures().map(function(feature){
 		            	line_feature = source_pathway.getFeatureById(feature.getId());
-		            /*
-	curve_style = feature.getStyle();
-		            	curve_sty
-*/
-			            if (line_feature.get('order') == yy)
+		            	curve_style = feature.getStyle();
+			            if (line_feature.get('order') == yy){ 
 			            	feature.setStyle(selectedStyle)
+			            	}
 			            
 		            })
+*/
 		            
 					
 		        })
@@ -1030,7 +851,8 @@ function update_scatter(){
 		        
 		        	yy = Math.floor(branch_yScale.invert(d3.mouse(this)[1]));
 		            
-		            bezierLayer.getSource().getFeatures().map(function(feature){
+		           /*
+ bezierLayer.getSource().getFeatures().map(function(feature){
 		            	line_feature = source_pathway.getFeatureById(feature.getId())
 			            if (line_feature.get('order') == yy){
 			            	if (line_feature.getId() == line_feature.origin_id)
@@ -1040,11 +862,9 @@ function update_scatter(){
 			            	}
 			            
 		            })
+*/
 		        
    		        });
-
-
-
 
 		    axes_rect
 		        .transition()
@@ -1094,7 +914,7 @@ function update_scatter(){
 	
 			    })
 					
-		    
+
 		    //Update old elements 
     dot = scatterplot.selectAll(".dot")
         .data(selected_data_points.filter(function(d) {
@@ -1142,9 +962,10 @@ function update_scatter(){
 
 		//Update Legend
 
-    legend.remove();
-
-    legend_box.remove();
+    if (legend){
+	    legend.remove();
+		legend_box.remove();       
+    }
 
     selectValue = d3.select('#select_color_axis').property('value');
     clabel = d3.select('#select_color_axis').node().options[selectValue].text;

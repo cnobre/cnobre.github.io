@@ -5,8 +5,8 @@ var margin = {
         bottom: 100,
         left: 120
     },
-    width = $(window).width() - margin.left - margin.right,
-    height = 700 - margin.top - margin.bottom;
+    width = $(window).width() - margin.left - margin.right, // width of both the scatterplot and the map
+    height = 700 - margin.top - margin.bottom; //height of the scatter plot display 
 
 
 
@@ -16,22 +16,21 @@ var all_data; //All original data as loaded in
 var map_data; //Data filtered geographically
 var data; //Data after all filters (geographic and with range sliders) have been applied 
 
-var selected_data_points = [];
+var selected_data_points = []; //stores data points that are within dist_threshold of the user drawn path
 
-var branch_no = -1;
-var max_dist = 0;
+var branch_no = -1; // counter for generating branch ids
+var max_dist =0; // variable to set maximum range for x (along_track_distance) axis; 
 
-branch_level = -1;
+branch_level = -1; //variable later used to assign branch ordering in scatterplot
 
-var mainStyle, otherstyle, selectedStyle;
+//openlayers styles for pathways drawn on map 
+var mainStyle, otherstyle, selectedStyle; 
 
 //Variables to store individual y_scales for each branch 
 var y_scales = [];
 
 //pathway width 
 var dist_threshold = 100;
-
-var format = new ol.format.GeoJSON();
 
 //Tooltip for points on scatter plot
 var tip = d3.tip()
@@ -70,6 +69,14 @@ var yValue = function(d) {
 var cValue = function(d) {
        return d.cs137;
     }; 
+    
+var dateValue = function (d) {
+    return d.date
+}
+
+var depthValue = function (d) {
+    return d.prs
+}
  
 // Scales    
 var xScale = d3.scale.linear()
@@ -107,7 +114,7 @@ var cMap = function(d) {
     return cScale(lin_logscale(d))
 }
  
- var featureOverlay;   
+var featureOverlay;   
 
 //Create axis objects    
 var xAxis = d3.svg.axis().scale(xScale).orient("bottom");
@@ -156,4 +163,28 @@ var tooltip = d3.select("body").append("div")
 
 //Legend for scatter colorbar
 var legend, legend_box;
+
+    // x-axis
+    scatterplot.append("g")
+        .attr("class", "x axis ")
+        .attr("transform", "translate(0," + height + ")")
+        //.call(xAxis)
+        .append("text")
+        .attr("x", width / 2)
+        .attr("y", 50)
+        .style("text-anchor", "end")
+        .text("Along Track Distance (km)")
+        .attr("class", "xlabel");
+
+    // y-axis
+    scatterplot.append("g")
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", 0 - (height / 2))
+        .attr("y", -90)
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text("cs137 (decay corrected)")
+        .attr("class", "ylabel");
+
 

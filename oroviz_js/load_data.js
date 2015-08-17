@@ -158,7 +158,7 @@ d3.csv('data/all_cruise_data.csv', function(error, DATA) {
         map_data = data;
 
 		create_map();
-		create_scatter();
+/* 		create_scatter(); */
 
     });
 
